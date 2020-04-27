@@ -13,14 +13,38 @@ class _ProfileState extends State<Profile> {
         title: Text('Profile'),
         titleSpacing: 0.2,
       ),
-      body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text("Profile"),
+
+      body: Column(children: <Widget>[
+        Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: <Widget>[
+              Icon(Icons.home, size: 40),
+              Text("Home")
+            ]
+          )
         ),
-      ),
+
+        Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            children: <Widget>[
+              Icon(Icons.pageview, size: 40),
+              Text("Headnews")
+            ]
+          )
+        ),
+
+        Center(
+          child: RaisedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Back to Dashboard"),
+          )
+        )
+
+      ]) 
     );
   }
 }
