@@ -13,6 +13,16 @@ class _SigninState extends State<Signin> {
   String userName = '';
   String passWord = '';
 
+  // Show hide password
+  bool _isHidePassword = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isHidePassword = !_isHidePassword;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +31,7 @@ class _SigninState extends State<Signin> {
       ),
 
       body: Center(child: Column(children: <Widget>[
+        // ----------------- TOP
         Container(
           margin: EdgeInsets.fromLTRB(0, 60, 0, 40),
           child: Column(
@@ -31,6 +42,7 @@ class _SigninState extends State<Signin> {
           )
         ),
 
+        // ----------------- USERNAME / EMAIL
         Container(
           margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
           child: TextField(
@@ -48,14 +60,27 @@ class _SigninState extends State<Signin> {
           )
         ),
 
+        // ----------------- PASSWORD
         Container(
           margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
           child: TextField(
             controller: password,
+            obscureText: _isHidePassword,
+            keyboardType: TextInputType.text,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(15, 4, 15, 4),
               border: OutlineInputBorder(),
-              labelText: "Password"
+              labelText: "Password",
+              isDense: true,
+              suffixIcon: GestureDetector(
+                onTap: () {
+                  _togglePasswordVisibility();
+                },
+                child: Icon(
+                  _isHidePassword ? Icons.visibility_off : Icons.visibility,
+                  color: _isHidePassword ? Colors.grey : Colors.blueAccent,
+                ),
+              ),
             ),
             onChanged: (text) {
               setState(() {
@@ -65,6 +90,7 @@ class _SigninState extends State<Signin> {
           )
         ),
         
+        // ----------------- BUTTON
         Center(child: FlatButton.icon(
             icon: Icon(Icons.check),
             color: Colors.blueAccent,

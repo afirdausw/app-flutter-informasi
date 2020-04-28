@@ -1,66 +1,50 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:pusatinformasi/view/profile.dart';
-import 'package:pusatinformasi/view/signin.dart';
+import 'package:pusatinformasi/view/home.dart';
+import 'package:pusatinformasi/view/intro.dart';
 
 void main() {
   runApp(new MaterialApp(
-      title: "Pusat Informasi",
-      home: new Home(),
+      debugShowCheckedModeBanner: false,
+      home: new IntroPage()
+      // home: new SplashScreen()
     )
   );
 }
 
-class Home extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+
+  void initState() {
+    super.initState();
+    startSplashScreen();
+  }
+
+  startSplashScreen() async {
+    var duration = const Duration(seconds: 2);
+    return Timer(duration, () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) {
+          return Home();
+        })
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Dashboad")
+    return Scaffold(
+      backgroundColor: Color(0xff3113E2),
+      body: Center(
+        child: Image.asset(
+          "images/logo_putih.png",
+          width: 200.0,
         ),
-
-        body: Column(children: <Widget>[
-          Center(child: Icon(Icons.directions, size: 60)),
-
-          Center(child: Container(
-              width: 200,
-              color: Colors.lightBlue,
-              padding: EdgeInsets.all(8),
-              margin: EdgeInsets.fromLTRB(0, 15, 0, 20),
-              child: Text(
-                "This is home,\nSemoga berhasil belajar Flutter nya.",
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.clip,
-                style: TextStyle(fontSize: 20, color: Colors.white, letterSpacing: 0.5),
-              )
-            )
-          ),
-
-          Center(child: FlatButton(
-              child: Text("Profile Page"),
-              color: Colors.blueAccent,
-              textColor: Colors.white,
-              onPressed: () {
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Profile()),
-                );
-              }
-            )
-          ),
-
-          Center(child: FlatButton(
-              child: Text("Signin Page"),
-              color: Colors.blueAccent,
-              textColor: Colors.white,
-              onPressed: () {
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Signin()),
-                );
-              }
-            )
-          ),
-
-        ])
       ),
     );
   }
