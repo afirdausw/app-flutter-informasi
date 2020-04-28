@@ -1,5 +1,7 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+
 import 'package:pusatinformasi/model/intro.dart';
 import 'package:pusatinformasi/utils/color_palette.dart';
 
@@ -14,22 +16,23 @@ class _IntroPageState extends State<IntroPage> {
     Intro(
       image: "images/icon_search.png",
       title: "Temukan",
-      description: "Discover information service who the best near you on Probolinggo"
+      description: "Ketahui berbagai informasi lokasi dan tempat-tempat terbaik yang ada di sekitar Probolinggo."
     ),
     Intro(
       image: "images/icon_hamburger.png",
-      title: "Order",
-      description: "Our veggie plan is filled with delicious seasonal vegetables, whole grains, beautiful cheeses and vegetarian proteins"
+      title: "Makanan",
+      description: "Cari tempat makan dan hidangan terbaik yang ada di Probolinggo."
     ),
     Intro(
       image: "images/icon_otw.png",
-      title: "Eat",
-      description: "Food delivery or pickup from local restaurants, Explore restaurants that deliver near you."
+      title: "Pesan",
+      description: "Anda juga dapat memesan, mengantarkan barang paket anda dengan mudah."
     )
   ];
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Swiper.children(
