@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pusatinformasi/profile.dart';
-import 'package:pusatinformasi/signin.dart';
+import 'package:pusatinformasi/view/profile.dart';
+import 'package:pusatinformasi/view/signin.dart';
 
 void main() {
   runApp(new MaterialApp(
