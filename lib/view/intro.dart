@@ -1,14 +1,23 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:pusatinformasi/model/intro.dart';
 import 'package:pusatinformasi/utils/color_palette.dart';
+import 'package:pusatinformasi/widgets/custom_flat_futton.dart';
+
+import 'package:pusatinformasi/view/home.dart';
 
 class IntroPage extends StatefulWidget {
+  final SharedPreferences prefs;
+  
+  IntroPage({ this.prefs });
+  
   @override
   _IntroPageState createState() => _IntroPageState();
 }
+
 
 class _IntroPageState extends State<IntroPage> {
 
@@ -29,6 +38,7 @@ class _IntroPageState extends State<IntroPage> {
       description: "Anda juga dapat memesan, mengantarkan barang paket anda dengan mudah."
     )
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +128,59 @@ class _IntroPageState extends State<IntroPage> {
         )
       );
     }
+
+    widgets.add(
+      new Container(
+        color: Color.fromRGBO(212, 20, 15, 1.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.code,
+                size: 125.0,
+                color: Colors.white,
+              ),
+              Padding(
+                padding:
+                const EdgeInsets.only(top: 50.0, right: 15.0, left: 15.0),
+                child: Text(
+                  "Jump straight into the action.",
+                  softWrap: true,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    decoration: TextDecoration.none,
+                    fontSize: 24.0,
+                    fontFamily: "NunitoSemiBold",
+                  )
+                )
+              ),
+              Padding(
+                padding:
+                const EdgeInsets.only(top: 20.0, right: 15.0, left: 15.0),
+                child: CustomFlatButton(
+                  title: "Get Started",
+                  fontSize: 22,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    widget.prefs.setBool('seen', true);
+                    Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Home()),
+                    );
+                  },
+                  splashColor: Colors.black12,
+                  borderColor: Colors.white,
+                  borderWidth: 2,
+                  color: Color.fromRGBO(212, 20, 15, 1.0),
+                )
+              )
+            ]
+          )
+        )
+      )
+    );
 
     return widgets;
   }

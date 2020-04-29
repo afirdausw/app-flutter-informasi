@@ -2,19 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:pusatinformasi/view/home.dart';
 import 'package:pusatinformasi/view/intro.dart';
 
+import 'package:pusatinformasi/view/main.dart';
+
+
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.blue, // status bar color
+    statusBarColor: Colors.blue
   ));
 
   runApp(new MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: new IntroPage()
-      home: new SplashScreen()
+      home: new SplashScreen(),
+      theme: ThemeData(
+        fontFamily: 'Nunito'
+      ),
     )
   );
 }
@@ -36,7 +40,8 @@ class _SplashScreenState extends State<SplashScreen> {
     return Timer(duration, () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) {
-          return Home();
+          // return MyApp();
+          return IntroPage();
         })
       );
     });
