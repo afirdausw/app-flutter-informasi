@@ -1,6 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:pusatinformasi/utils/color_palette.dart';
 
 import 'package:pusatinformasi/view/profile.dart';
 import 'package:pusatinformasi/view/signin.dart';
@@ -15,6 +21,25 @@ class _HomeState extends State<Home> {
 
   // Listing Berita
   final List<String> menu = ["Terkini", "Terbaru", "Kategori", "Tags"];
+
+  List data;
+
+  // Function to get the JSON data
+  Future<String> getJSONData() async {
+    var response = await http.get(
+        // Encode the url
+        Uri.encodeFull("https://unsplash.com/napi/photos/Q14J2k8VE3U/related"),
+
+        // Only accept JSON response
+        headers: {"Accept": "application/json"},
+    );
+
+    setState(() {
+      data = json.decode(response.body)['results'];
+    });
+
+    return "Successfull";
+  }
 
   // Bottom sheet menu
   int _selectedTabIndex = 0;
@@ -36,6 +61,7 @@ class _HomeState extends State<Home> {
     'images/carousel/slide_3.jpg',
     'images/carousel/slide_4.jpg',
     'images/carousel/slide_5.jpg',
+    'images/carousel/slide_6.jpg'
   ];
  
   List<T> map<T>(List list, Function handler) {
@@ -44,6 +70,12 @@ class _HomeState extends State<Home> {
       result.add(handler(i, list[i]));
     }
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.getJSONData();
   }
 
   // Void Main
@@ -126,6 +158,32 @@ class _HomeState extends State<Home> {
               )
             )
           ]
+        ),
+
+        Card(
+          elevation: 1,
+          shape:RoundedRectangleBorder(
+            borderRadius:  BorderRadius.circular(0)
+          ),
+          color: ColorPalette.white,
+          margin: EdgeInsets.only(top: 10, bottom: 20),
+          child: Container(
+            height: 200,
+            width: MediaQuery.of(context).size.width,
+            padding: EdgeInsets.all(20),
+            alignment: Alignment.topLeft,
+            child: Row(children: <Widget>[
+                Container(
+                  child: Text("Berita Terkini", style: TextStyle(
+                      fontFamily: "NunitoSemiBold",
+                      fontSize: 18,
+                      color: ColorPalette.black
+                    )
+                  )
+                )
+              ]
+            )
+          )
         ),
 
         Center(child: Icon(Feather.instagram, size: 60, color: Colors.blue)),
@@ -217,7 +275,7 @@ class _HomeState extends State<Home> {
                   color: Colors.blue,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                   onPressed: () {
-
+                    // To-Do
                   },
                 )
               );
@@ -225,6 +283,11 @@ class _HomeState extends State<Home> {
           )
         )
       ),
+
+      _buildListView(),
+
+      // ------------------------------- HALAMAN PESAN
+      Text("Halaman Pesan"),
 
       // ------------------------------- HALAMAN PROFIL
       Text("Halaman Profil")
@@ -242,6 +305,11 @@ class _HomeState extends State<Home> {
       ),
 
       BottomNavigationBarItem(
+        icon: Icon(Feather.bell),
+        title: Text("Pesan") 
+      ),
+
+      BottomNavigationBarItem(
         icon: Icon(Feather.user),
         title: Text("Profil") 
       )
@@ -253,9 +321,9 @@ class _HomeState extends State<Home> {
       onTap: _onNavBarTapped,
       iconSize: 24.0,
       elevation: 8.0,
-      selectedIconTheme: const IconThemeData(),
+      selectedItemColor: ColorPalette.primaryColor,
       selectedFontSize: 12.0,
-      unselectedIconTheme: const IconThemeData(),
+      unselectedItemColor: ColorPalette.grey,
       showUnselectedLabels: false,
     );
 
@@ -268,6 +336,44 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: _bottomNavBar
       
+    );
+  }
+  
+  Widget _buildListView() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: data == null ? 0 : data.length,
+      itemBuilder: (context, index) {
+        return _buildImageColumn(data[index]);
+      }
+    );
+  }
+
+  Widget _buildImageColumn(dynamic item) => Container(
+    decoration: BoxDecoration(
+      color: Colors.white54
+    ),
+    margin: const EdgeInsets.all(4),
+    child: Column(
+      children: [
+        new CachedNetworkImage(
+          imageUrl: item['urls']['small'],
+          placeholder: (context, url) => new CircularProgressIndicator(),
+          errorWidget: (context, url, error) => new Icon(Icons.error),
+          fadeOutDuration: new Duration(seconds: 1),
+          fadeInDuration: new Duration(seconds: 3),
+        ),
+        _buildRow(item)
+      ]
+    )
+  );
+
+  Widget _buildRow(dynamic item) {
+    return ListTile(
+      title: Text(
+        item['description'] == null ? '': item['description'],
+      ),
+      subtitle: Text("Likes: " + item['likes'].toString()),
     );
   }
 }

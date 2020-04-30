@@ -42,7 +42,7 @@ class CustomFlatButton extends StatelessWidget {
             decoration: TextDecoration.none,
             fontSize: fontSize,
             fontWeight: fontWeight,
-            fontFamily: "OpenSans",
+            fontFamily: "Nunito",
           ),
         ),
       ),

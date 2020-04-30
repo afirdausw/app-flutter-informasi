@@ -131,53 +131,75 @@ class _IntroPageState extends State<IntroPage> {
 
     widgets.add(
       new Container(
-        color: Color.fromRGBO(212, 20, 15, 1.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                Icons.code,
-                size: 125.0,
-                color: Colors.white,
-              ),
-              Padding(
-                padding:
-                const EdgeInsets.only(top: 50.0, right: 15.0, left: 15.0),
-                child: Text(
-                  "Jump straight into the action.",
-                  softWrap: true,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    decoration: TextDecoration.none,
-                    fontSize: 24.0,
-                    fontFamily: "NunitoSemiBold",
-                  )
-                )
-              ),
-              Padding(
-                padding:
-                const EdgeInsets.only(top: 20.0, right: 15.0, left: 15.0),
-                child: CustomFlatButton(
-                  title: "Get Started",
-                  fontSize: 22,
-                  textColor: Colors.white,
-                  onPressed: () {
-                    widget.prefs.setBool('seen', true);
-                    Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Home()),
-                    );
-                  },
-                  splashColor: Colors.black12,
-                  borderColor: Colors.white,
-                  borderWidth: 2,
-                  color: Color.fromRGBO(212, 20, 15, 1.0),
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height/6
+        ),
+
+        child: ListView(
+          children: <Widget>[
+            Image.asset(
+              "images/icon_otw.png",
+              height: MediaQuery.of(context).size.height/4.0
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height/12.0
+              )
+            ),
+
+            Center(
+              child: Text(
+                "Mari mari sini",
+                style: TextStyle(
+                  color: ColorPalette.titleColor,
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.w500
                 )
               )
-            ]
-          )
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height/40.0
+              )
+            ),
+
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.height/20.0
+              ),
+              child: Text(
+                "Lorem ipsum dolor amet sit",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: ColorPalette.descriptionColor,
+                  fontSize: 15.0,
+                  height: 1.5
+                )
+              )
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(top: 30.0, right: 25.0, left: 25.0),
+              child: CustomFlatButton(
+                title: "Ayo Mulai",
+                fontSize: 16,
+                textColor: Colors.white,
+                onPressed: () {
+                  // widget.prefs.setBool('seen', true);
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Home()),
+                  );
+                },
+                splashColor: Colors.black12,
+                borderColor: Colors.white,
+                borderWidth: 2,
+                color: Colors.blueAccent,
+              )
+            )
+
+          ]
         )
       )
     );
