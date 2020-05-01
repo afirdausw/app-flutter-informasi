@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pusatinformasi/view/berita.dart';
 import 'package:pusatinformasi/view/intro.dart';
 
 import 'package:pusatinformasi/view/main.dart';
@@ -39,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Timer(duration, () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) {
-          // return MyApp();
+          // return MyHomePage();
           return IntroPage();
         })
       );

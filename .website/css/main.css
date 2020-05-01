@@ -1,0 +1,452 @@
+@font-face {
+    font-family: Nunito;
+    src: url(../font/Nunito/Nunito-SemiBold.ttf);
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: Nunito;
+    src: url(../font/Nunito/Nunito-Regular.ttf);
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Nunito;
+    src: url(../font/Nunito/Nunito-Light.ttf);
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: Staatliches;
+    src: url(../font/Staatliches/Staatliches-Regular.ttf);
+    font-weight: 300;
+}
+
+body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    text-rendering: optimizeLegibility;
+    font-size: 1em;
+    line-height: 1.5;
+    color: #333;
+    background: #ECF0F5;
+}
+
+body:after {
+    content: "";
+    width: 100%;
+    height: 200px;
+    background: #0769D8;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+img {
+    width: 100%;
+}
+
+a,
+a:link,
+a:visited {
+    color: #333;
+    text-decoration: none;
+}
+
+ion-icon {
+    position: relative;
+    top: 2px;
+}
+
+h1.judul {
+    font-family: 'Staatliches', sans-serif;
+}
+
+/* NAV HEADER */
+nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: -70px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+}
+
+nav ul,
+nav ul li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline-block;
+}
+
+nav a,
+nav a:link,
+nav a:visited {
+    font-size: 20px;
+    margin: 0 2px;
+    color: #FFF;
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    line-height: 38px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    text-align: center;
+    transition: all .2s linear;
+}
+
+nav a:hover {
+    background-color: #054D9A;
+}
+
+nav input {
+    height: 30px;
+    line-height: 30px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    width: 350px;
+    outline: 0;
+    color: #FFF;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+}
+
+nav input::placeholder {
+    color: #DDD;
+}
+
+nav form ion-icon {
+    color: #FFF;
+    font-size: 1.3em;
+    top: 3px;
+    margin-right: 10px;
+}
+
+nav img {
+    background-color: #FFF;
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    position: relative;
+    top: -2px
+}
+
+nav img.default {
+    padding: 1px
+}
+
+.wrap {
+    padding: 0;
+    height: auto;
+    display: flex;
+}
+
+.wrap-left {
+    min-width: 250px;
+    max-width: 250px;
+    height: 100vh;
+    background: #FFF;
+    text-align: center;
+    position: sticky;
+    top: 0;
+}
+
+.wrap-right {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    margin-top: 70px;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.menu-top {
+    padding: 30px 0;
+    border-bottom: solid 1px #eee;
+}
+
+.menu-top img {
+    width: 160px;
+    display: inline-block;
+    margin: 15px 0;
+}
+
+.menu-top h4 {
+    margin: 20px 0 5px;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.menu-top p {
+    margin: 0;
+    color: #666;
+}
+
+/* Main Menu*/
+.menu-bottom {
+    padding-top: 20px;
+}
+
+.menu-bottom a {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 3px;
+    height: 35px;
+    line-height: 35px;
+    text-align: left;
+    padding: 0 20px;
+    position: relative;
+    transition: all .2s linear;
+}
+
+.menu-bottom ion-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    top: 3px;
+}
+
+.menu-bottom a:hover,
+.menu-bottom a.active {
+    color: #FFF;
+    background: #0769D8;
+}
+
+.menu-bottom .divider {
+    height: 1px;
+    background: #EEE;
+    margin: 8px 53px;
+}
+
+.menu-bottom .icon {
+    width: 25px;
+    display: inline-block;
+}
+
+/* Content */
+h1.title {
+    text-align: left;
+    letter-spacing: 1px;
+    color: #FFF;
+    margin: 0 0 20px;
+    font-weight: 500;
+    font-size: 1.7em;
+}
+
+.back-content {
+    background: #FFF;
+    box-sizing: border-box;
+    padding: 20px;
+    min-height: 300px;
+    margin-bottom: 50px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px #55555510;
+}
+
+.button-top,
+.button-top:link,
+.button-top:visited {
+    position: absolute;
+    top: 24px;
+    left: 30px;
+    height: 38px;
+    width: 38px;
+    line-height: 46px;
+    text-align: center;
+    font-size: 2em;
+    border-radius: 50px;
+    background-color: #FFF;
+    transition: all .3s ease-in-out;
+}
+
+.button-top.edit {
+    left: 75px;
+    font-size: 1.3em;
+    background-color: #fdb519;
+    color: #FFF;
+}
+
+.button-top.delete {
+    left: 120px;
+    font-size: 1.6em;
+    background-color: #d81919;
+    color: #FFF;
+}
+
+.button-top:hover {
+    background-color: #054D9A !important;
+    color: #FFF;
+}
+
+.button-top + h1.title {
+    position: relative;
+    left: 55px;
+    display: inline-block;
+}
+
+.button-top.delete + h1.title {
+    left: 150px;
+    width: calc(100% - 150px);
+}
+
+.button-top.small-icon {
+    font-size: 1.6em;
+    line-height: 42px;
+}
+
+/* Info Bottom */
+.info {
+    position: fixed;
+    bottom: 20px;
+    left: calc(50% - 40px);
+    transform: translateX(0 -50%);
+    font-size: .9em;
+    color: #888;
+    z-index: -1;
+}
+
+/* FORM */
+.form label {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 0.3em;
+}
+
+.form input,
+.form textarea {
+    font-family: inherit;
+    margin-bottom: 20px;
+    border-radius: 6px;
+}
+
+.form input[type='file'] {
+    border-radius: 0;
+}
+
+.form button {
+    border-radius: 6px;
+    font-size: 1em;
+    font-family: inherit;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.form #img,
+.form #img-berita {
+    width: 100%;
+    background-color: #F5F5F5;
+    border: solid 2px #f1f1f1;
+    margin-bottom: 30px;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: 0 2px 10px #33333310;
+}
+
+.form #img > ion-icon {
+    font-size: 6em;
+    color: #666;
+    margin: 50px 0;
+}
+
+.alert {
+    border-radius: 10px;
+    box-shadow: 0 2px 15px #55555530;
+
+}
+
+.alert b::after {
+    content: ", ";
+}
+
+/* LISTING DATA */
+.list-media {
+    border: solid 1px #F5F5F5;
+    background-color: #F5F5F5;
+    border-radius: 10px;
+    padding-right: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    cursor: default;
+    transition: all .2s linear;
+}
+
+.list-media:hover {
+    box-shadow: 0 1px 10px #33333315
+}
+
+.list-media img {
+    width: 180px;
+    height: 140px;
+    object-fit: cover;
+    float: left;
+    margin-right: 10px;
+}
+
+.list-media h5 {
+    font-size: 1.1em;
+    margin-top: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    display: -webkit-box;
+    display: -moz-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    -moz-line-clamp: 1;
+    -moz-box-orient: vertical;
+}
+
+.list-media p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 0.9em;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: justify;
+    
+    display: -webkit-box;
+    display: -moz-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    -moz-line-clamp: 3;
+    -moz-box-orient: vertical;
+}
+
+.list-media a:hover {
+    color: #0769D8;
+}
+
+/* DETAIL */
+.berita-detail .col-sm-4 > img {
+    border-radius: 10px;
+    box-shadow: 0 1px 10px #33333315;
+    margin-bottom: 20px;
+}
+
+.berita-detail .col-sm-8 > p {
+    white-space: pre-wrap;
+    text-align: justify;
+    line-height: 1.5;
+}
+
+.tags {
+    display: inline-block;
+    background-color: #EEE;
+    padding: 6px 15px;
+    border-radius: 20px;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: default;
+}
