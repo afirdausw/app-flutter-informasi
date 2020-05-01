@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -356,13 +356,13 @@ class _HomeState extends State<Home> {
     margin: const EdgeInsets.all(4),
     child: Column(
       children: [
-        new CachedNetworkImage(
-          imageUrl: item['urls']['small'],
-          placeholder: (context, url) => new CircularProgressIndicator(),
-          errorWidget: (context, url, error) => new Icon(Icons.error),
-          fadeOutDuration: new Duration(seconds: 1),
-          fadeInDuration: new Duration(seconds: 3),
-        ),
+        CachedNetworkImage(
+         imageUrl: item['urls']['small'],
+         placeholder: (context, url) => new CircularProgressIndicator(),
+         errorWidget: (context, url, error) => new Icon(Icons.error),
+         fadeOutDuration: new Duration(seconds: 1),
+         fadeInDuration: new Duration(seconds: 3),
+       ),
         _buildRow(item)
       ]
     )
