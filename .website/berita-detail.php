@@ -10,8 +10,8 @@
 ?>
 
 <a class="button-top small-icon" href="berita.php"> <ion-icon name="arrow-back-outline"></ion-icon> </a>
-<a class="button-top small-icon edit" href="berita.php"> <ion-icon name="pencil-outline"></ion-icon> </a>
-<a class="button-top small-icon delete" href="berita.php"> <ion-icon name="trash-outline"></ion-icon> </a>
+<a class="button-top small-icon edit" href="berita-ubah.php?judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>"> <ion-icon name="pencil-outline"></ion-icon> </a>
+<a class="button-top small-icon delete" href="action-berita.php?action=hapus&judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>" onClick="return confirm('Yakin ingin menghapus data? \nData tersebut tidak bisa di kembalikan lagi.')"> <ion-icon name="trash-outline"></ion-icon> </a>
 
 <h1 class="title"><?= $value['judul'] ?></h1>
 
@@ -20,19 +20,19 @@
         <div class="col-12 col-sm-4">
             <img id="img-berita" src="uploads/berita/<?= $value['gambar'] ?>" alt="<?= $value['judul'] ?>" title="<?= $value['judul'] ?>">
 
-            <small class="d-block mb-1">Waktu posting :</small>
+            <small class="d-block mb-1 text-secondary">Waktu posting :</small>
             <span>
                 <ion-icon name="time-outline"></ion-icon>
                 <?= tanggal(date('D, d M Y, H:i', strtotime($value['tanggal_pos']))) ?>
             </span>
 
-            <small class="d-block mb-1 mt-3">Oleh :</small>
+            <small class="d-block mb-1 mt-3 text-secondary">Oleh :</small>
             <span>
                 <ion-icon name="person-outline"></ion-icon>
                 Mas Admin
             </span>
 
-            <small class="d-block mb-1 mt-3">Dilihat :</small>
+            <small class="d-block mb-1 mt-3 text-secondary">Dilihat :</small>
             <span>
                 <ion-icon name="eye-outline"></ion-icon>
                 13 kali

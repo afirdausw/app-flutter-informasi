@@ -12,7 +12,7 @@
 
 <div class="back-content">
     <?php
-        $query = mysqli_query($connect, "SELECT * FROM berita ORDER BY id_berita DESC");
+        $query = mysqli_query($connect, "SELECT * FROM berita ORDER BY tanggal_pos DESC");
         while ($value = mysqli_fetch_array($query)) {
     ?>
     <div class="list-media">
@@ -24,9 +24,16 @@
                 <small>
                     <ion-icon name="time-outline"></ion-icon>
                     <?= tanggal(date('D, d M Y, H:i', strtotime($value['tanggal_pos']))) ?>
+                    
+                    <ion-icon name="eye-outline" class="ml-4"></ion-icon>
+                    13 kali
                 </small>
                 <a href="berita-detail.php?judul=<?= $value['link'] ?>"> Selengkapnya <ion-icon name="arrow-forward-outline"></ion-icon> </a>
             </div>
+        </div>
+        <div class="wrap">
+            <a class="button-top small-icon edit" href="berita-ubah.php?judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>"> <ion-icon name="pencil-outline"></ion-icon> </a>
+            <a class="button-top small-icon delete" href="action-berita.php?action=hapus&judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>" onClick="return confirm('Yakin ingin menghapus data? \nData tersebut tidak bisa di kembalikan lagi.')"> <ion-icon name="trash-outline"></ion-icon> </a>
         </div>
     </div>
     <?php } ?>

@@ -1,10 +1,12 @@
 <?php
-    $page = 'Pengumuman';
+    $page = 'Pencarian';
 
     include 'php/atas.php';
+
+    $cari = $_GET['cari'];
 ?>
 
-<h1 class="title">Daftar Pengumuman</h1>
+<h1 class="title">Mencari tentang "<?= $cari ?>"</h1>
 
 <div class="back-content">
     ...

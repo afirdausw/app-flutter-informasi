@@ -1,10 +1,10 @@
 <?php
-    $page = 'Pengumuman';
+    $page = 'Tanya Jawab';
 
     include 'php/atas.php';
 ?>
 
-<h1 class="title">Daftar Pengumuman</h1>
+<h1 class="title">Tanya Jawab</h1>
 
 <div class="back-content">
     ...

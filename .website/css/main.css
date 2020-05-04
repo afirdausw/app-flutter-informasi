@@ -155,7 +155,7 @@ nav img.default {
 .wrap-left {
     min-width: 250px;
     max-width: 250px;
-    height: 100vh;
+    min-height: 100vh;
     background: #FFF;
     text-align: center;
     position: sticky;
@@ -196,10 +196,14 @@ nav img.default {
 
 /* Main Menu*/
 .menu-bottom {
+    position: sticky;
+    top: 0;
     padding-top: 20px;
+    padding-bottom: 30px
 }
 
-.menu-bottom a {
+.menu-bottom a,
+.menu-bottom div.menu {
     display: block;
     font-weight: 500;
     margin-bottom: 3px;
@@ -208,6 +212,7 @@ nav img.default {
     text-align: left;
     padding: 0 20px;
     position: relative;
+    cursor: pointer;
     transition: all .2s linear;
 }
 
@@ -218,7 +223,9 @@ nav img.default {
 }
 
 .menu-bottom a:hover,
-.menu-bottom a.active {
+.menu-bottom a.active,
+.menu-bottom div.menu:hover,
+.menu-bottom div.menu.active {
     color: #FFF;
     background: #0769D8;
 }
@@ -232,6 +239,47 @@ nav img.default {
 .menu-bottom .icon {
     width: 25px;
     display: inline-block;
+}
+
+/* Dropdown Menu */
+.menu {
+    position: relative;
+}
+
+.menu:hover .menu-dropdown {
+    display: block;
+}
+
+.menu-dropdown {
+    position: absolute;
+    width: 70%;
+    top: 0;
+    right: 2px;
+    transform: translate(0, 36px);
+    background: #FFF;
+    border: solid 1px #E1E1E1;
+    border-radius: 4px;
+    box-shadow: 0 1px 10px #55555520;
+    z-index: 999 !important;
+    padding: 5px 0;
+    margin: 0;
+    display: none;
+    transition: all .2s linear;
+}
+
+.menu-dropdown a { 
+    padding: 0 10px 0 10px
+}
+
+.menu-dropdown li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.menu-dropdown li ion-icon {    
+    width: 20px;
+    margin-right: 5px
 }
 
 /* Content */
@@ -371,6 +419,7 @@ h1.title {
 
 /* LISTING DATA */
 .list-media {
+    position: relative;
     border: solid 1px #F5F5F5;
     background-color: #F5F5F5;
     border-radius: 10px;
@@ -383,6 +432,10 @@ h1.title {
 
 .list-media:hover {
     box-shadow: 0 1px 10px #33333315
+}
+
+.list-media:hover > .wrap {
+    opacity: 1;
 }
 
 .list-media img {
@@ -426,6 +479,27 @@ h1.title {
 
 .list-media a:hover {
     color: #0769D8;
+}
+
+.list-media .wrap {
+    position: absolute;
+    top: 4px;
+    right: 0;
+    opacity: 0;
+    transition: all .2s linear
+}
+
+.list-media .button-top.edit,
+.list-media .button-top.delete {
+    position: relative;
+    margin-right: 5px;
+    left: unset;
+    top: unset;
+    font-size: 20px;
+    height: 32px;
+    width: 32px;
+    line-height: 35px;
+    color: #FFF
 }
 
 /* DETAIL */

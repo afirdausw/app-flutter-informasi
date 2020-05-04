@@ -34,26 +34,49 @@
 
                 <div class="divider"></div>
 
-                <a <?= isset($page) && $page == 'Galeri' ? "class='active'" : '' ?> href="galeri.php"> <ion-icon name="image-outline"></ion-icon> Galeri</a>
                 <a <?= isset($page) && $page == 'Berita' ? "class='active'" : '' ?> href="berita.php"> <ion-icon name="newspaper-outline"></ion-icon> Berita</a>
+                <a <?= isset($page) && $page == 'Video' ? "class='active'" : '' ?> href="video.php"> <ion-icon name="videocam-outline"></ion-icon> Video</a>
                 <a <?= isset($page) && $page == 'Pengumuman' ? "class='active'" : '' ?> href="pengumuman.php"> <ion-icon name="chatbox-ellipses-outline"></ion-icon> Pengumuman</a>
 
                 <div class="divider"></div>
 
-                <a <?= isset($page) && $page == 'Tentang' ? "class='active'" : '' ?> href="tentang.php"> <ion-icon name="information-circle-outline"></ion-icon> Tentang</a>
-                <a <?= isset($page) && $page == 'Pengguna' ? "class='active'" : '' ?> href="pengguna.php"> <ion-icon name="people-outline"></ion-icon> Pengguna</a>
+                <div href="#" class="menu">
+                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon> Data Tempat
+                    <ul class="menu-dropdown">
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Destinasi Wisata</li></a>
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Travel</li></a>
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Hotel</li></a>
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Kuliner</li></a>
+                    </ul>
+                </div>
+                <div href="#" class="menu">
+                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon> Data Info
+                    <ul class="menu-dropdown">
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Rumah Sakit</li></a>
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Sekolah</li></a>
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Pekerjaan</li></a>
+                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Lowongan</li></a>
+                    </ul>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <a <?= isset($page) && $page == 'Pengaduan' ? "class='active'" : '' ?> href="pengaduan.php"> <ion-icon name="archive-outline"></ion-icon> Pengaduan </a>
+                <a <?= isset($page) && $page == 'Tanya Jawab' ? "class='active'" : '' ?> href="tanya.php"> <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Tanya Jawab </a>
 
                 <div class="divider"></div>
 
+                <a <?= isset($page) && $page == 'Pengguna' ? "class='active'" : '' ?> href="pengguna.php"> <ion-icon name="people-outline"></ion-icon> Pengguna</a>
                 <a href="keluar.php"> <ion-icon name="log-out-outline"></ion-icon> Logout</a>
             </div>
         </div>
 
         <div class="wrap-right">
             <nav>
-                <form action="#" method="get">
+                <form action="cari.php" method="get">
                     <ion-icon name="search-outline"></ion-icon>
-                    <input type="text" placeholder="Cari apapun disini...">
+                    <input type="text" name="cari" placeholder="Cari apapun disini...">
+                    <input type="submit" value="Submit" class="d-none">
                 </form>
 
                 <ul>
