@@ -365,6 +365,15 @@ h1.title {
 }
 
 /* FORM */
+.form .custom-control-inline {
+    margin-right: 25px
+}
+
+.form label.custom-control-label {
+    color: #333;
+    font-size: 1em
+}
+
 .form label {
     font-size: 0.9em;
     color: #666;
@@ -477,7 +486,7 @@ h1.title {
     -moz-box-orient: vertical;
 }
 
-.list-media a:hover {
+.list-media a:hover h5 {
     color: #0769D8;
 }
 

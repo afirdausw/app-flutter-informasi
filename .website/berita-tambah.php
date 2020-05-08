@@ -23,7 +23,21 @@
                 <input type="file" id="img-change" accept="image/*" name="gambar">
             </div>
             <div class="col-12 col-sm-8">
-                <label for="judul">Judul Berita</label>
+                <label class="d-block mb-1">Kategori</label>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" id="nasional" name="kategori" value="Nasional" checked="">
+                    <label class="custom-control-label" for="nasional">Nasional</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" id="kab" name="kategori" value="Kabupaten">
+                    <label class="custom-control-label" for="kab">Kabupaten</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" id="kota" name="kategori" value="Kota">
+                    <label class="custom-control-label" for="kota">Kota</label>
+                </div>
+                
+                <label for="judul" class="d-block mt-3">Judul Berita</label>
                 <input type="text" class="form-control" id="judul" name="judul">
 
                 <label for="konten">Konten</label>

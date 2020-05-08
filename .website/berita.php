@@ -17,7 +17,7 @@
     ?>
     <div class="list-media">
         <img src="uploads/berita/<?= $value['gambar'] ?>" alt="<?= $value['judul'] ?>" title="<?= $value['judul'] ?>">
-        <div class="list-body">
+        <a class="list-body" href="berita-detail.php?judul=<?= $value['link'] ?>">
             <h5><?= $value['judul'] ?></h5>
             <p><?= $value['konten'] ?></p>
             <div class="d-flex justify-content-between align-items-end" style="margin-top: 10px">
@@ -25,12 +25,14 @@
                     <ion-icon name="time-outline"></ion-icon>
                     <?= tanggal(date('D, d M Y, H:i', strtotime($value['tanggal_pos']))) ?>
                     
+                    <ion-icon name="compass-outline" class="ml-4"></ion-icon>
+                    <?= $value['kategori'] ?>
+                    
                     <ion-icon name="eye-outline" class="ml-4"></ion-icon>
                     13 kali
                 </small>
-                <a href="berita-detail.php?judul=<?= $value['link'] ?>"> Selengkapnya <ion-icon name="arrow-forward-outline"></ion-icon> </a>
             </div>
-        </div>
+        </a>
         <div class="wrap">
             <a class="button-top small-icon edit" href="berita-ubah.php?judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>"> <ion-icon name="pencil-outline"></ion-icon> </a>
             <a class="button-top small-icon delete" href="action-berita.php?action=hapus&judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>" onClick="return confirm('Yakin ingin menghapus data? \nData tersebut tidak bisa di kembalikan lagi.')"> <ion-icon name="trash-outline"></ion-icon> </a>

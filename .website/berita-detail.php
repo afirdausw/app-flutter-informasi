@@ -20,7 +20,13 @@
         <div class="col-12 col-sm-4">
             <img id="img-berita" src="uploads/berita/<?= $value['gambar'] ?>" alt="<?= $value['judul'] ?>" title="<?= $value['judul'] ?>">
 
-            <small class="d-block mb-1 text-secondary">Waktu posting :</small>
+            <small class="d-block mb-1 text-secondary">Kategori Berita :</small>
+            <span>
+                <ion-icon name="compass-outline"></ion-icon>
+                <?= $value['kategori'] ?>
+            </span>
+            
+            <small class="d-block mb-1 mt-3 text-secondary">Waktu posting :</small>
             <span>
                 <ion-icon name="time-outline"></ion-icon>
                 <?= tanggal(date('D, d M Y, H:i', strtotime($value['tanggal_pos']))) ?>

@@ -15,6 +15,7 @@
 
     if (isset($_POST['action'])) {
         $id         = $_POST['id'];
+        $kategori   = $_POST['kategori'];
         $judul      = addslashes($_POST['judul']);
         $konten     = addslashes($_POST['konten']);
         $tag        = addslashes($_POST['tag']);
@@ -29,7 +30,7 @@
             if (!empty($judul) || !empty($konten) || !empty($tag) || !empty($foto)) {
                 $query = mysqli_query($connect, "INSERT INTO berita SET
                                                 judul='$judul', konten='$konten', tag='$tag', gambar='$foto_file',
-                                                tanggal_pos=NOW(), link='$link' ");
+                                                kategori='$kategori', tanggal_pos=NOW(), link='$link' ");
                 copy($temp, "uploads/berita/". $foto_file);
 
                 $_SESSION['info-pesan']  = '<b>Informasi</b> berita berhasil ditambahkan!';
@@ -47,12 +48,12 @@
             if (!empty($foto)) {
                 $query = mysqli_query($connect, "UPDATE berita SET
                                                 judul='$judul', konten='$konten', tag='$tag', gambar='$foto_file',
-                                                tanggal_pos=NOW(), link='$link' WHERE id_berita='$id' ");
+                                                kategori='$kategori', tanggal_pos=NOW(), link='$link' WHERE id_berita='$id' ");
                 copy($temp, "uploads/berita/". $foto_file);
             }
             else {
                 $query = mysqli_query($connect, "UPDATE berita SET
-                                                judul='$judul', konten='$konten', tag='$tag',
+                                                judul='$judul', konten='$konten', tag='$tag', kategori='$kategori', 
                                                 tanggal_pos=NOW(), link='$link' WHERE id_berita='$id' ");
             }
             
