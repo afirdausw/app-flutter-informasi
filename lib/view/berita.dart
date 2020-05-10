@@ -68,7 +68,6 @@ class _MyHomePageState extends State<MyHomePage> {
       itemCount: data == null ? 0 : data.length,
       itemBuilder: (context, index) {
         return _buildImageColumn(data[index]);
-        // return _buildRow(data[index]);
       }
     );
   }
