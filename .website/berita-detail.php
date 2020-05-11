@@ -9,9 +9,9 @@
     $value = mysqli_fetch_array($query);
 ?>
 
-<a class="button-top small-icon" href="berita.php"> <ion-icon name="arrow-back-outline"></ion-icon> </a>
-<a class="button-top small-icon edit" href="berita-ubah.php?judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>"> <ion-icon name="pencil-outline"></ion-icon> </a>
-<a class="button-top small-icon delete" href="action-berita.php?action=hapus&judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>" onClick="return confirm('Yakin ingin menghapus data? \nData tersebut tidak bisa di kembalikan lagi.')"> <ion-icon name="trash-outline"></ion-icon> </a>
+<a class="button-top small-icon" href="berita.php" data-toggle="tooltip" title="Kembali"> <ion-icon name="arrow-back-outline"></ion-icon> </a>
+<a class="button-top small-icon edit" href="berita-ubah.php?judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>" data-toggle="tooltip" title="Ubah Data"> <ion-icon name="pencil-outline"></ion-icon> </a>
+<a class="button-top small-icon delete" href="action-berita.php?action=hapus&judul=<?= $value['link'] ?>&berita=<?= $value['id_berita'] ?>" data-toggle="tooltip" title="Hapus Data" onClick="return confirm('Yakin ingin menghapus data? \nData tersebut tidak bisa di kembalikan lagi.')"> <ion-icon name="trash-outline"></ion-icon> </a>
 
 <h1 class="title"><?= $value['judul'] ?></h1>
 

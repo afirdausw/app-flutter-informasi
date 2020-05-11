@@ -40,16 +40,16 @@
 
                 <div class="divider"></div>
 
-                <div href="#" class="menu">
+                <div class="menu <?= isset($page) && $page == 'Tempat' ? "active" : '' ?>">
                     <ion-icon name="ellipsis-horizontal-outline"></ion-icon> Data Tempat
                     <ul class="menu-dropdown">
-                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Destinasi Wisata</li></a>
-                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Travel</li></a>
-                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Hotel</li></a>
-                        <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Kuliner</li></a>
+                        <a href="wisata.php"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Destinasi Wisata</li></a>
+                        <a href="travel.php"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Travel</li></a>
+                        <a href="hotel.php"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Hotel</li></a>
+                        <a href="kuliner.php"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Kuliner</li></a>
                     </ul>
                 </div>
-                <div href="#" class="menu">
+                <div class="menu <?= isset($page) && $page == 'Info' ? "active" : '' ?>">
                     <ion-icon name="ellipsis-horizontal-outline"></ion-icon> Data Info
                     <ul class="menu-dropdown">
                         <a href="#"><li><ion-icon name="caret-forward-circle-outline"></ion-icon> Rumah Sakit</li></a>
@@ -81,7 +81,7 @@
 
                 <ul>
                     <a href="#"> <li> <ion-icon name="notifications-outline"></ion-icon> </li> </a>
-                    <a href="#"> <li> <ion-icon name="cog-outline"></ion-icon> </li> </a>
-                    <a href="#"> <li> <img class="default" src="img/user-img.png" alt="User image"> </li> </a>
+                    <a href="#" data-toggle="tooltip" title="Pengaturan"> <li> <ion-icon name="cog-outline"></ion-icon> </li> </a>
+                    <a href="#" data-toggle="tooltip" title="Akun Profil"> <li> <img class="default" src="img/user-img.png" alt="User image"> </li> </a>
                 </ul>
             </nav>

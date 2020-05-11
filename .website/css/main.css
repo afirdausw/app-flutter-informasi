@@ -353,6 +353,78 @@ h1.title {
     line-height: 42px;
 }
 
+/* Gallery Page */
+.gallery {
+    margin-right: -10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.media {
+    width: calc(25% - 10px);
+    margin: 0 10px 20px 0;
+    height: auto;
+    background: #FFF;
+    border-radius: 12px;
+    display: inline-block;
+    overflow: hidden;
+    box-shadow: 0 0 5px #00000006;
+    transition: all .3s ease-in-out;
+}
+
+.media:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 10px #00000020;
+}
+
+.media:hover > .wrap-img img {
+    filter: brightness(100%);
+}
+
+.media .wrap-img {
+    position: relative;
+    height: 200px;
+}
+
+.wrap-img img {
+    height: 200px;
+    object-fit: cover;
+    filter: brightness(85%);
+    transition: all .2s linear;
+}
+
+.wrap-img span {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+    font-size: .8em;
+    background: #FFFFFF70;
+    padding: 2px 6px;
+    border-radius: 8px;
+}
+
+
+.media h3 {
+    margin: 10px 0 5px;
+    padding: 0 10px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.media h4 {
+    margin: 0 0 15px;
+    padding: 0 10px;
+    font-size: 13px;
+    font-weight: normal;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 /* Info Bottom */
 .info {
     position: fixed;
@@ -400,6 +472,7 @@ h1.title {
 }
 
 .form #img,
+.form #image,
 .form #img-berita {
     width: 100%;
     background-color: #F5F5F5;
@@ -512,7 +585,8 @@ h1.title {
 }
 
 /* DETAIL */
-.berita-detail .col-sm-4 > img {
+.berita-detail .col-sm-4 > img,
+.data-detail img {
     border-radius: 10px;
     box-shadow: 0 1px 10px #33333315;
     margin-bottom: 20px;
@@ -532,4 +606,43 @@ h1.title {
     margin-top: 10px;
     margin-right: 10px;
     cursor: default;
+}
+
+.data-detail h5 {
+    line-height: 1.5;
+    cursor: default
+}
+
+.data-detail a:hover {
+    color: #0769D8;
+}
+
+/* --- DASHBOARD --- */
+/* Covid */
+.covid > div {
+    padding: 10px;
+    margin: 0 15px 15px;
+    border-radius: 10px;
+}
+
+.covid h5 {
+    margin: 5px 0 0 0;
+}
+
+.covid small {
+    font-size: 13px;
+    color: #888;
+}
+
+#modal-covid input {
+    font-size: 18px;
+}
+
+/* Custom css bootstrap */
+.badge {
+    padding: .25em .4em .32em;
+}
+
+.modal-content {
+    border-radius: 10px;
 }

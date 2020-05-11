@@ -10,7 +10,7 @@
     $value = mysqli_fetch_array($query);
 ?>
 
-<a class="button-top small-icon" href="berita.php"> <ion-icon name="arrow-back-outline"></ion-icon> </a>
+<a class="button-top small-icon" href="berita.php" data-toggle="tooltip" title="Kembali"> <ion-icon name="arrow-back-outline"></ion-icon> </a>
 
 <h1 class="title">Ubah Berita</h1>
 
@@ -62,6 +62,8 @@
 <?php include 'php/bawah.php'; ?>
 
 <script type="text/javascript">
+    var imgfile = "uploads/berita/<?= $value['gambar']; ?>";
+    
     $("#img-change").change(function(){
         readURL(this);
     });
@@ -76,5 +78,9 @@
             }
             reader.readAsDataURL(input.files[0]);
         }
+    }
+    
+    function bersihkan() {
+        $('#img-berita').attr('src', imgfile);
     }
 </script>

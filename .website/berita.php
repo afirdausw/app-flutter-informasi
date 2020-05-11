@@ -4,7 +4,7 @@
     include 'php/atas.php';
 ?>
 
-<a class="button-top" href="berita-tambah.php"> <ion-icon name="add-outline"></ion-icon> </a>
+<a class="button-top" href="berita-tambah.php" data-toggle="tooltip" title="Tambah Data"> <ion-icon name="add-outline"></ion-icon> </a>
 
 <h1 class="title">Daftar Berita</h1>
 
