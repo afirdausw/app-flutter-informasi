@@ -773,7 +773,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ),
                       
                       Container(
-                        height: 160,
+                        height: 176,
                         margin: EdgeInsets.only(top: 5),
                         padding: EdgeInsets.only(left: 15),
                         child: _buildListVideo(dataVideo)
@@ -1384,26 +1384,39 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       );
     },
     child: Container(
-      height: 150,
       width: 200,
       margin: EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(6),
         boxShadow: [
           BoxShadow(
-            color: Color(0x05000000),
+            color: Color(0x10000000),
             blurRadius: 4.0,
             spreadRadius: 1.0,
             offset: Offset(0.0, 2.0))]
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Center(
-            child: Text(item['nama_video'], style: TextStyle(color: Colors.grey)),
+          Container(
+            width: double.infinity,
+            height: 115.0,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(6)),
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                repeat: ImageRepeat.noRepeat,
+                image: NetworkImage(url + "uploads/video/" + item['gambar'])
+              )
+            ),
+            child: Center(
+              child: Icon(Ionicons.ios_play_circle, size: 50, color: Color(0xCCFF0000))
+            )
           ),
-          Text(item['nama_video'], style: TextStyle(color: ColorPalette.dark)),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            child: Text(item['nama_video'], style: TextStyle(color: ColorPalette.dark), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
+          )
         ],
       )
     )
