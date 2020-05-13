@@ -1,10 +1,40 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:informasi/utils/color_palette.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:informasi/utils/color_palette.dart';
+
+// GET ID OF APP AND ADS
+String getAppId() {
+  if (Platform.isIOS) {
+    return null;
+  } else if (Platform.isAndroid) {
+    return 'ca-app-pub-5511375838860331~6177512186';
+  }
+  return null;
+}
+String getBannerAdUnitId() {
+  if (Platform.isIOS) {
+    return null;
+  } else if (Platform.isAndroid) {
+    return 'ca-app-pub-5511375838860331/4672858826';
+  }
+  return null;
+}
+String getInterstitialAdUnitId() {
+  if (Platform.isIOS) {
+    return null;
+  } else if (Platform.isAndroid) {
+    return 'ca-app-pub-5511375838860331/1991048685';
+  }
+  return null;
+}
+// END OF
 
 class BeritaDetail extends StatefulWidget {
   @override
@@ -12,6 +42,36 @@ class BeritaDetail extends StatefulWidget {
 }
 
 class _BeritaDetailState extends State<BeritaDetail> {
+
+  // BANNER
+  BannerAd myBanner;
+
+  BannerAd buildBannerAd() {
+    return BannerAd(
+        adUnitId: getBannerAdUnitId(),
+        size: AdSize.banner,
+        listener: (MobileAdEvent event) {
+          print("Banner $event");
+          if (event == MobileAdEvent.loaded) {
+            myBanner..show();
+          }
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAdMob.instance.initialize(appId: getAppId());
+
+    myBanner = buildBannerAd()..load();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    myBanner.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     
@@ -72,7 +132,8 @@ class _BeritaDetailState extends State<BeritaDetail> {
                 },
                 child: Text('Berita Lainnya', style: TextStyle(fontSize: 14, color: ColorPalette.black))
               )
-            )
+            ),
+            SizedBox(height: 50)
           ]
         )
     );

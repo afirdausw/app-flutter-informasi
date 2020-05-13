@@ -18,13 +18,11 @@ import 'signin_google.dart';
 import 'download_app.dart';
 
 import 'profile.dart';
-import 'signin.dart';
-import 'signup.dart';
-import 'berita.dart';
 import 'berita_detail.dart';
 
 
 var isLoading = false;
+var isLoadingCovid = false;
 
 class Home extends StatefulWidget {
 
@@ -48,52 +46,101 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    this.getJSONData();
     this.getDataCovid();
+
+    this.getBeritaKab();
+    this.getBeritaKot();
+    this.getBeritaNas();
+
+    this.getDataVideo();
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
   }
 
-  // Listing Berita, Covid-19
-  List data;
-  Future<String> getJSONData() async {
+  // Listing Berita
+  List dataKab, dataKot, dataNas;
+  
+  Future<String> getBeritaKab() async {
     setState(() {
       isLoading = true;
     });
 
-    final response = await http.get(url + "api/berita.php");
+    final response = await http.get(url + "api/berita.php?kategori=kab");
     if (response.statusCode == 200) {
-      data = json.decode(response.body)['semua'];
+      dataKab = json.decode(response.body)['semua'];
       setState(() {
         isLoading = false;
       });
     } else {
-      throw Exception('Failed to load photos');
+      throw Exception('Failed to load data');
     }
     return 'success';
   }
 
-  List dataCovid;
-  Future<String> getDataCovid() async {
-    // var res = await http.get(Uri.encodeFull(url + "api/covid.php"), headers: { 'accept':'application/json' });
-    final res = await http.get(url + "api/covid.php");
+  Future<String> getBeritaKot() async {
     setState(() {
-      dataCovid = json.decode(res.body)['semua'];
+      isLoading = false;
     });
+
+    final response = await http.get(url + "api/berita.php?kategori=kot");
+    if (response.statusCode == 200) {
+      dataKot = json.decode(response.body)['semua'];
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
     return 'success';
   }
-  
-  // Future<List<Covid>> getCovid() async {
-  //   List<Covid> copid;
 
-  //   final response = await http.get(url + "api/covid.php");
-  //   final responseJson = json.decode(response.body);
-  //   final rest = responseJson["semua"] as List;
-  //   copid = rest.map<Covid>((json) => Covid.fromJson(json)).toList();
+  Future<String> getBeritaNas() async {
+    setState(() {
+      isLoading = false;
+    });
 
-  //   return copid;
-  //   // return Covid.fromJson(responseJson);
-  // }
+    final response = await http.get(url + "api/berita.php?kategori=nas");
+    if (response.statusCode == 200) {
+      dataNas = json.decode(response.body)['semua'];
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+    return 'success';
+  }
+
+  // Info Covid-19
+  List dataCovid;
+  Future<String> getDataCovid() async {
+    setState(() {
+      isLoadingCovid = true;
+    });
+
+    final res = await http.get(url + "api/covid.php");
+    if (res.statusCode == 200) {
+      dataCovid = json.decode(res.body)['semua'];
+      setState(() {
+        isLoadingCovid = false;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+    return 'success';
+  }
+
+  // List Video
+  List dataVideo;
+  Future<String> getDataVideo() async {
+    final res = await http.get(url + "api/video.php");
+    if (res.statusCode == 200) {
+      dataVideo = json.decode(res.body)['semua'];
+    } else {
+      throw Exception('Failed to load data');
+    }
+    return 'success';
+  }
 
   // Bottom sheet menu
   int _selectedTabIndex = 0;
@@ -124,6 +171,30 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       result.add(handler(i, list[i]));
     }
     return result;
+  }
+
+  // onWillPop or back pressed
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Are you sure?'),
+        content: new Text('Do you want to exit an App'),
+        actions: <Widget>[
+          new FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: new Text('No'),
+          ),
+          new FlatButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+              SystemNavigator.pop();
+            },
+            child: new Text('Yes'),
+          ),
+        ],
+      ),
+    )) ?? false;
   }
 
   // Void Main
@@ -168,7 +239,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         child: Container(
                           padding: EdgeInsets.all(1.0),
                           decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: Color(0xCCFF0000),
                             shape: BoxShape.circle,
                           ),
                           constraints: BoxConstraints(
@@ -196,7 +267,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 new Container(
                   width: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.only(bottom: 150),
-                  child: new Column(
+                  child:
+                    isLoading ? Center(child: CupertinoTheme( data: CupertinoTheme.of(context).copyWith(brightness: Brightness.dark), child: CupertinoActivityIndicator())) :
+                  new Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -241,7 +314,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       // INFORMASI COVID
                       new Container(
                         height: 400,
-                        child: new ListView.builder(
+                        child:
+                        isLoadingCovid ? Center(child: CupertinoActivityIndicator()) :
+                        new ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: 1,
                           itemBuilder: (context, index) {
@@ -264,6 +339,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                 child: Text("Pusat Layanan & Informasi", style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),
                               ),
 
+                              // MENU
                               Container(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: 
@@ -400,7 +476,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Icon(FontAwesome5.heart)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Info Rumah Sakit", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Daftar Rumah Sakit", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                           ],
                                         )
                                       )
@@ -425,7 +501,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Icon(FontAwesome5.heart)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Info Sekolah", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Daftar Sekolah", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                           ],
                                         )
                                       )
@@ -452,7 +528,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Icon(FontAwesome5.heart)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Info Perusahaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Daftar Perusahaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                           ],
                                         )
                                       )
@@ -479,7 +555,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 child: Icon(FontAwesome5.heart)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Info Lowongan Pekerjaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Lowongan Pekerjaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
                                           ],
                                         )
                                       ),
@@ -597,6 +673,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                 ])
                               ),
 
+                              // BERITA HOME
                               new Container(
                                 width: MediaQuery.of(context).size.width,
                                 color: Colors.white,
@@ -634,15 +711,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         controller: _controller,
                                         children: [
                                           Container(
-                                            child: _buildListViewSmall(),
+                                            child: _buildListViewSmall(dataKab),
                                           ),
                                           Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                                            child: Text("Berita Kota"),
+                                            child: _buildListViewSmall(dataKot),
                                           ),
                                           Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                                            child: Text("Berita Nasional"),
+                                            child: _buildListViewSmall(dataNas),
                                           ),
                                         ]),
                                     ),
@@ -666,62 +741,42 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                 )
                               ),
 
-                              new Container(
-                                width: double.infinity,
-                                margin: EdgeInsets.only(left: 20, right: 20),
-                                child: FlatButton(
-                                  child: Text("Profile Page".toUpperCase()),
-                                  color: Colors.blueAccent,
-                                  textColor: Colors.white,
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => Profile()),
-                                    );
-                                  })),
-                              new Container(
-                                width: double.infinity,
-                                margin: EdgeInsets.only(left: 20, right: 20),
-                                child: FlatButton(
-                                  child: Text("Signin Page".toUpperCase()),
-                                  color: Colors.blueAccent,
-                                  textColor: Colors.white,
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius: new BorderRadius.circular(8.0)),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => Signin()),
-                                    );
-                                  })),
-                              new Container(
-                                width: double.infinity,
-                                margin: EdgeInsets.only(left: 20, right: 20),
-                                child: FlatButton(
-                                  child: Text("Sign Up With Ads".toUpperCase()),
-                                  color: Colors.blueAccent,
-                                  textColor: Colors.white,
-                                  shape: new RoundedRectangleBorder(
-                                    borderRadius: new BorderRadius.circular(18.0)),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => SignUp()),
-                                    );
-                                  })),
-
-                              FlatButton(
-                                child: Text("Berita Page".toUpperCase()),
-                                color: Colors.blueAccent,
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                     MaterialPageRoute(builder: (context) => Berita()),
-//                                    MaterialPageRoute(builder: (context) => MyHomePage()),
-                                );
-                              }),
-
                           ])
+                      ),
+
+                      new Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                        child: new Column(
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text("Video Terkini", style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),   
+                                GestureDetector(
+                                  onTap: () {
+                                    Scaffold.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Sedang dalam pengembangan."),
+                                        action: SnackBarAction(
+                                          label: "Oke",
+                                          onPressed: Scaffold.of(context).hideCurrentSnackBar
+                                        )
+                                      )
+                                    );
+                                  },
+                                  child: Text("Selengkapnya", style: TextStyle(fontSize: 12, color: ColorPalette.dark))
+                                )    
+                            ]),
+                          ]
+                        )
+                      ),
+                      
+                      Container(
+                        height: 160,
+                        margin: EdgeInsets.only(top: 5),
+                        padding: EdgeInsets.only(left: 15),
+                        child: _buildListVideo(dataVideo)
                       )
                       
                     ]
@@ -786,16 +841,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             controller: _controller2,
             children: [
               RefreshIndicator(
-                child: _buildListView(),
-                onRefresh: getJSONData,
+                child: isLoading  ? Center(child: Container(child: CupertinoTheme( data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator())))
+                                  : _buildListView(dataKab),
+                onRefresh: getBeritaKab,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Text("Berita Kota"),
+              RefreshIndicator(
+                child: isLoading  ? Center(child: Container(child: CupertinoTheme( data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator())))
+                                  : _buildListView(dataKot),
+                onRefresh: getBeritaKot,
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Text("Berita Nasional"),
+              RefreshIndicator(
+                child: isLoading  ? Center(child: Container(child: CupertinoTheme( data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator())))
+                                  : _buildListView(dataNas),
+                onRefresh: getBeritaNas,
               ),
             ]),
         ),
@@ -947,16 +1005,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     );
 
     // ------ SCAFFOLD
-    return Scaffold(
-      body: isLoading
-            ?
-            Center(
-              child: CupertinoActivityIndicator(),
-            )
-            :
-            _listPage[_selectedTabIndex],
-            bottomNavigationBar: _bottomNavBar,
-            backgroundColor: Color(0xfff5f5f5),
+    return new WillPopScope(
+      onWillPop: _onWillPop,
+      child: new Scaffold(
+        body: _listPage[_selectedTabIndex],
+              bottomNavigationBar: _bottomNavBar,
+              backgroundColor: Color(0xfff5f5f5),
+        )
       );
   }
 
@@ -1152,12 +1207,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   );
 
   // BERITA PAGE
-  Widget _buildListView() {
+  Widget _buildListView(List berita) {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemCount: data == null ? 0 : data.length,
+      itemCount: berita == null ? 0 : berita.length,
       itemBuilder: (context, index) {
-        return _buildImageColumn(data[index]);
+        return _buildImageColumn(berita[index]);
       }
     );
   }
@@ -1200,7 +1255,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             child: new CachedNetworkImage(
               fit: BoxFit.cover,
               imageUrl: url + "uploads/berita/" + item['gambar'],
-              placeholder: (context, url) => new CupertinoActivityIndicator(),
+              placeholder: (context, url) => new Container(
+                height: 150.0,
+                child: new CupertinoActivityIndicator(),
+              ),
               errorWidget: (context, url, error) => new Icon(Icons.error),
               fadeOutDuration: new Duration(seconds: 1),
               fadeInDuration: new Duration(seconds: 1),
@@ -1217,13 +1275,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   );
 
   // BERITA LIST SMALL ----------------------
-  Widget _buildListViewSmall() {
+  Widget _buildListViewSmall(List dataBerita) {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      itemCount: data == null ? 0 : 4,
+      itemCount: dataBerita == null ? 0 : 4,
       itemBuilder: (context, index) {
-        return _buildImageColumnSmall(data[index]);
+        return _buildImageColumnSmall(dataBerita[index]);
       }
     );
   }
@@ -1295,4 +1353,59 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     )
   );
 
+  // VIDEO LIST SMALL
+  Widget _buildListVideo(List video) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return _buildCard(video[index]);
+      }
+    );
+  }
+
+  Widget _buildCard(dynamic item) => GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context, MaterialPageRoute(
+          builder: (context) => BeritaDetail(),
+          settings: RouteSettings(
+              arguments: {
+                "kategori"  : item['kategori'],
+                "gambar"    : url + "uploads/berita/" + item['gambar'],
+                "judul"     : item['judul'],
+                "konten"    : item['konten'],
+                "tag"       : item['tag'],
+                "lihat"     : item['lihat'],
+                "tanggal"   : item['tanggal_pos']
+              }
+          )
+        )
+      );
+    },
+    child: Container(
+      height: 150,
+      width: 200,
+      margin: EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 4.0,
+            spreadRadius: 1.0,
+            offset: Offset(0.0, 2.0))]
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Center(
+            child: Text(item['nama_video'], style: TextStyle(color: Colors.grey)),
+          ),
+          Text(item['nama_video'], style: TextStyle(color: ColorPalette.dark)),
+        ],
+      )
+    )
+  );
 }
