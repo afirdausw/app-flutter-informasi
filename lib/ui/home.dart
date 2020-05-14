@@ -1,21 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:http/http.dart' as http;
-
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:jiffy/jiffy.dart';
 
 import 'package:informasi/utils/color_palette.dart';
 
 import 'signin_google.dart';
+
 import 'download_app.dart';
+import 'data_wisata.dart';
 
 import 'profile.dart';
 import 'berita_detail.dart';
@@ -23,21 +26,20 @@ import 'berita_detail.dart';
 
 var isLoading = false;
 var isLoadingCovid = false;
+var isLoadingVideo = false;
 
 class Home extends StatefulWidget {
-
-  Home({Key key, this.title}) : super(key: key);
-  final String title;
-
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
+
   // Server URL
   final String url = "http://10.0.2.2/onlenkan-informasi/";
   // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
+  // final String url = "https://informasi.onlenkan.org/";
 
   // Tab Bar
   TabController _controller;
@@ -46,13 +48,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    
     this.getDataCovid();
-
     this.getBeritaKab();
     this.getBeritaKot();
     this.getBeritaNas();
-
     this.getDataVideo();
+
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
   }
@@ -133,9 +135,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   // List Video
   List dataVideo;
   Future<String> getDataVideo() async {
+    setState(() {
+      isLoadingVideo = true;
+    });
+
     final res = await http.get(url + "api/video.php");
     if (res.statusCode == 200) {
       dataVideo = json.decode(res.body)['semua'];
+      setState(() {
+        isLoadingVideo = false;
+      });
     } else {
       throw Exception('Failed to load data');
     }
@@ -178,19 +187,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return (await showDialog(
       context: context,
       builder: (context) => new AlertDialog(
-        title: new Text('Are you sure?'),
-        content: new Text('Do you want to exit an App'),
+        title: new Text('Konfirmasi', style: TextStyle(fontSize: 16)),
+        content: new Text('Yakin ingin menutup aplikasi?', style: TextStyle(fontSize: 14)),
+        shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(8.0)),
         actions: <Widget>[
           new FlatButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: new Text('No'),
+            child: new Text('Tidak'),
           ),
           new FlatButton(
             onPressed: () {
               Navigator.of(context).pop(false);
               SystemNavigator.pop();
             },
-            child: new Text('Yes'),
+            child: new Text('Ya, Tutup'),
           ),
         ],
       ),
@@ -315,7 +326,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       new Container(
                         height: 400,
                         child:
-                        isLoadingCovid ? Center(child: CupertinoActivityIndicator()) :
+                        isLoadingCovid ? Center(child: CupertinoTheme( data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator())) :
                         new ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: 1,
@@ -340,6 +351,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                               ),
 
                               // MENU
+                              // BARIS 1
                               Container(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: 
@@ -349,25 +361,33 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   children: <Widget>[
                                     GestureDetector(
                                       onTap: () {
-                                        //
+                                        Navigator.push(context,
+                                          MaterialPageRoute(builder: (context) => DestinasiWisata()),
+                                        );
                                       },
                                       child: Container(
                                         width: MediaQuery.of(context).size.width / 4,
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(Ionicons.ios_airplane, size: 30, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Destinasi Wisata", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Destinasi Wisata", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -381,15 +401,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(Ionicons.ios_car, size: 28, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
                                             Text("Travel", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
@@ -406,15 +432,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(Ionicons.ios_bed, size: 26, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
                                             Text("Hotel", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
@@ -431,15 +463,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.utensils, size: 21, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
                                             Text("Oleh - Oleh", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
@@ -449,6 +487,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                     ),
                                 ])
                               ),
+                              // BARIS 2
                               Container(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: 
@@ -465,18 +504,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.hospital, size: 25, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Daftar Rumah Sakit", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Rumah Sakit", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -490,18 +535,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.school, size: 23, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Daftar Sekolah", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Daftar Sekolah", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -517,18 +568,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.building, size: 23, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Daftar Perusahaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Daftar Perusahaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -544,18 +601,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.briefcase, size: 23, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Lowongan Pekerjaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Lowongan Pekerjaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       ),
@@ -563,6 +626,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                     
                                 ])
                               ),
+                              // BARIS 3
                               Container(
                                 padding: EdgeInsets.only(top: 10, bottom: 40),
                                 child: 
@@ -579,18 +643,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.headset, size: 25, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Layanan Publik", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Layanan Publik", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -604,18 +674,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.comments, size: 24, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Tanya Jawab", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Tanya Jawab", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -629,18 +705,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.phone_volume, size: 26, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Nomor Darurat", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Nomor Darurat", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -654,18 +736,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         padding: EdgeInsets.symmetric(horizontal: 2),
                                         child: Column(
                                           children: <Widget>[
-                                            Card(
-                                              elevation: 4,
+                                            Container(
+                                              decoration: BoxDecoration(
                                               color: Colors.white,
-                                              shape:  new RoundedRectangleBorder(
-                                                borderRadius: new BorderRadius.circular(8.0)),
+                                                borderRadius: new BorderRadius.circular(8.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Color(0x10000000),
+                                                    blurRadius: 3.0,
+                                                    spreadRadius: 1.0,
+                                                    offset: Offset(1.0, 3.0))]
+                                              ),
                                               child: Container(
                                                 height: 50,
                                                 width: 50,
-                                                child: Icon(FontAwesome5.heart)
+                                                child: Icon(FontAwesome5Solid.comment_dots, size: 23, color: Colors.blue)
                                             )),
                                             SizedBox(height: 5),
-                                            Text("Pengaduan", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                            Text("Pengaduan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
                                           ],
                                         )
                                       )
@@ -776,7 +864,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         height: 176,
                         margin: EdgeInsets.only(top: 5),
                         padding: EdgeInsets.only(left: 15),
-                        child: _buildListVideo(dataVideo)
+                        child: isLoadingVideo ? CupertinoActivityIndicator() : _buildListVideo(dataVideo)
                       )
                       
                     ]
@@ -882,18 +970,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   margin: EdgeInsets.only(top: 10),
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    "Notifikasi dari Onlenkan",
+                    "Daftar Event",
                     style: TextStyle(color: Colors.white, fontSize: 18.0, fontFamily: "NunitoSemiBold")),
                 )
               ])
             ))
         ]),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          width: MediaQuery.of(context).size.width,
-          child: Text("Hallo from notifikasi")
+          height: MediaQuery.of(context).size.height - 156.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              CupertinoActivityIndicator(),
+              SizedBox(height: 10),
+              Text("On Progress...", style: TextStyle(fontSize: 16, fontFamily: "NunitoSemiBold"))
+            ]
+          )
         ),
-        CupertinoActivityIndicator()
 
       ]),
 
@@ -1279,7 +1373,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      itemCount: dataBerita == null ? 0 : 4,
+      itemCount: 4,
       itemBuilder: (context, index) {
         return _buildImageColumnSmall(dataBerita[index]);
       }
@@ -1365,23 +1459,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   Widget _buildCard(dynamic item) => GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context, MaterialPageRoute(
-          builder: (context) => BeritaDetail(),
-          settings: RouteSettings(
-              arguments: {
-                "kategori"  : item['kategori'],
-                "gambar"    : url + "uploads/berita/" + item['gambar'],
-                "judul"     : item['judul'],
-                "konten"    : item['konten'],
-                "tag"       : item['tag'],
-                "lihat"     : item['lihat'],
-                "tanggal"   : item['tanggal_pos']
-              }
-          )
-        )
-      );
+    onTap: () async {
+      String url = item['link'];
+
+      if (await canLaunch(url)) {
+        await launch(url, forceSafariVC: false, forceWebView: false);
+      }
     },
     child: Container(
       width: 200,
