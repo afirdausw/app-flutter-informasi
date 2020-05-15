@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     if (seen) {
       return new Home();
     } else {
-      return new IntroPage(prefs: prefs);
+      return new IntroPage();
     }
   }
 }

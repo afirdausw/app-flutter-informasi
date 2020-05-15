@@ -42,19 +42,19 @@ String getInterstitialAdUnitId() {
   return null;
 }
 
-class DestinasiWisata extends StatefulWidget {
+class Hotel extends StatefulWidget {
   @override
-  DestinasiWisataState createState() => DestinasiWisataState();
+  HotelState createState() => HotelState();
 }
 
-class DestinasiWisataState extends State<DestinasiWisata> {
+class HotelState extends State<Hotel> {
 
   // Server URL
   final String url = "http://10.0.2.2/onlenkan-informasi/";
   // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
   // final String url = "https://informasi.onlenkan.org/";
- 
+  
   // ADS
   InterstitialAd myInterstitial;
 
@@ -104,7 +104,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
       isLoading = true;
     });
 
-    final res = await http.get(url + "api/wisata.php");
+    final res = await http.get(url + "api/hotel.php");
     if (res.statusCode == 200) {
       data = json.decode(res.body)['semua'];
       setState(() {
@@ -120,7 +120,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Destinasi Wisata", style: TextStyle(color: Colors.white, fontSize: 18.0, fontFamily: "NunitoSemiBold")),
+        title: Text("Daftar Hotel", style: TextStyle(color: Colors.white, fontSize: 18.0, fontFamily: "NunitoSemiBold")),
       ),
       body: isLoading ? Center(child: Container(child: CupertinoTheme( data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator())))
                       : Padding(padding: EdgeInsets.all(1), child: _buildGridView()),
@@ -151,7 +151,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
-        imageUrl: url + "uploads/wisata/" + item['gambar'],
+        imageUrl: url + "uploads/hotel/" + item['gambar'],
         placeholder: (context, url) => new Container(
           height: 150.0,
           child: new CupertinoTheme(data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator()),
@@ -171,7 +171,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Text(
-              item['nama_wisata'],
+              item['nama_hotel'],
               maxLines: 1,
               softWrap: true,
               overflow: TextOverflow.ellipsis,
@@ -195,7 +195,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
       ),
       GestureDetector(
         onTap: () {
-          showModal(context, item['nama_wisata'], item['alamat'], item['telepon'], item['gambar'], item['google_maps']);
+          showModal(context, item['nama_hotel'], item['alamat'], item['telepon'], item['gambar'], item['google_maps']);
         },
         child: Container(
           height: double.infinity,
@@ -230,7 +230,6 @@ class DestinasiWisataState extends State<DestinasiWisata> {
                   children: <Widget>[
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
                         boxShadow: [BoxShadow(
                           color: Color(0x40000000),
                           blurRadius: 10.0,
@@ -250,7 +249,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
                         : CachedNetworkImage(
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          imageUrl: url + "uploads/wisata/" + gambar,
+                          imageUrl: url + "uploads/hotel/" + gambar,
                           placeholder: (context, url) => new Container(
                             height: 150.0,
                             child: new CupertinoTheme(data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator()),
@@ -268,7 +267,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text("Nama Wisata", style: TextStyle(fontSize: 10, color: ColorPalette.grey)),
+                          Text("Nama Hotel", style: TextStyle(fontSize: 10, color: ColorPalette.grey)),
                           Text(nama, style: TextStyle(fontSize: 15, color: ColorPalette.black, fontFamily: "NunitoSemiBold" )),
                           SizedBox(height: 10),
                           Text("Alamat", style: TextStyle(fontSize: 10, color: ColorPalette.grey)),
@@ -282,7 +281,7 @@ class DestinasiWisataState extends State<DestinasiWisata> {
                   ]
                 )
               ),
-
+              
               gmaps == ''
               ? Text("")
               : OutlineButton(

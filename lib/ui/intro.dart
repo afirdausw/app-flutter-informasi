@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:informasi/model/intro.dart';
 import 'package:informasi/utils/color_palette.dart';
@@ -10,10 +9,6 @@ import 'package:informasi/widgets/custom_flat_futton.dart';
 import 'home.dart';
 
 class IntroPage extends StatefulWidget {
-  final SharedPreferences prefs;
-
-  IntroPage({this.prefs});
-
   @override
   _IntroPageState createState() => _IntroPageState();
 }
