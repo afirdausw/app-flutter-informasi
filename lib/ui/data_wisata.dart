@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'dart:io' show Platform;
+import 'dart:developer' as developer;
 
 import 'package:http/http.dart' as http;
 
@@ -104,14 +106,18 @@ class DestinasiWisataState extends State<DestinasiWisata> {
       isLoading = true;
     });
 
-    final res = await http.get(url + "api/wisata.php");
-    if (res.statusCode == 200) {
-      data = json.decode(res.body)['semua'];
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
+    try {
+      final res = await http.get(url + "api/wisata.php");
+      if (res.statusCode == 200) {
+        data = json.decode(res.body)['semua'];
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } on SocketException {
+      developer.log('Koneksi internet tidak tersedia', name: 'Koneksi Internet');
     }
     return 'success';
   }

@@ -48,14 +48,14 @@ class _BeritaDetailState extends State<BeritaDetail> {
 
   BannerAd buildBannerAd() {
     return BannerAd(
-        adUnitId: getBannerAdUnitId(),
-        size: AdSize.banner,
-        listener: (MobileAdEvent event) {
-          print("Banner $event");
-          if (event == MobileAdEvent.loaded) {
-            myBanner..show();
-          }
-        });
+      adUnitId: getBannerAdUnitId(),
+      size: AdSize.banner,
+      listener: (MobileAdEvent event) {
+        print("Banner $event");
+        if (event == MobileAdEvent.loaded) {
+          myBanner..show();
+        }
+      });
   }
 
   @override
@@ -102,17 +102,40 @@ class _BeritaDetailState extends State<BeritaDetail> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               width: double.infinity,
-              child: Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: <Widget>[
-                  Icon(Feather.user, size: 12, color: ColorPalette.grey),
-                  SizedBox(width: 4),
-                  Text("Mas Admin", style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: <Widget>[
+                      Icon(Feather.user, size: 12, color: ColorPalette.grey),
+                      SizedBox(width: 5),
+                      Text("Mas Admin", style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
+                    ]
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: <Widget>[
+                      Icon(Feather.calendar, size: 12, color: ColorPalette.grey),
+                      SizedBox(width: 5),
+                      Text(Jiffy(intent['tanggal'].toString()).format("dd MMMM yyyy, HH:mm"), style: TextStyle(fontSize: 12, color: ColorPalette.grey))
+                    ]
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: <Widget>[
+                      Icon(Feather.map_pin, size: 12, color: ColorPalette.grey),
+                      SizedBox(width: 5),
+                      Text("Berita " + intent['kategori'], style: TextStyle(fontSize: 12, color: ColorPalette.grey))
+                    ]
+                  ),
                   SizedBox(width: 25),
-                  Icon(Feather.calendar, size: 12, color: ColorPalette.grey),
-                  SizedBox(width: 4),
-                  Text(Jiffy(intent['tanggal'].toString()).format("dd MMMM yyyy, HH:mm"), style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
                 ]
               )
             ),

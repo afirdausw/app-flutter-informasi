@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'dart:io' show Platform;
+import 'dart:developer' as developer;
 
 import 'package:http/http.dart' as http;
 
@@ -104,14 +106,18 @@ class OlehOlehState extends State<OlehOleh> {
       isLoading = true;
     });
 
-    final res = await http.get(url + "api/kuliner.php");
-    if (res.statusCode == 200) {
-      data = json.decode(res.body)['semua'];
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
+    try {
+      final response = await http.get(url + "api/kuliner.php");
+      if (response.statusCode == 200) {
+        data = json.decode(response.body)['semua'];
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        developer.log('Gagal mengambil data', name: 'Koneksi Server');
+      }
+    } on SocketException {
+      developer.log('Koneksi internet tidak tersedia', name: 'Koneksi Internet');
     }
     return 'success';
   }

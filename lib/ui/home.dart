@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -74,12 +75,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    
-    this.getDataCovid();
-    this.getBeritaKab();
-    this.getBeritaKot();
-    this.getBeritaNas();
-    this.getDataVideo();
+
+    this.getDataFromJson();
 
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
@@ -87,92 +84,36 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // Listing Berita
   List dataKab, dataKot, dataNas;
-  
-  Future<String> getBeritaKab() async {
+  List dataCovid, dataVideo;
+
+  Future<String> getDataFromJson() async {
     setState(() {
       isLoading = true;
     });
 
-    final response = await http.get(url + "api/berita.php?kategori=kab");
-    if (response.statusCode == 200) {
-      dataKab = json.decode(response.body)['semua'];
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
-    return 'success';
-  }
+    try {
+      final response = await http.get(url + "api/covid.php");
+      final resVid = await http.get(url + "api/video.php");
+      final resKab = await http.get(url + "api/berita.php?kategori=kab");
+      final resKot = await http.get(url + "api/berita.php?kategori=kot");
+      final resNas = await http.get(url + "api/berita.php?kategori=nas");
 
-  Future<String> getBeritaKot() async {
-    setState(() {
-      isLoading = false;
-    });
+      if (response.statusCode == 200) {
 
-    final response = await http.get(url + "api/berita.php?kategori=kot");
-    if (response.statusCode == 200) {
-      dataKot = json.decode(response.body)['semua'];
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
-    return 'success';
-  }
-
-  Future<String> getBeritaNas() async {
-    setState(() {
-      isLoading = false;
-    });
-
-    final response = await http.get(url + "api/berita.php?kategori=nas");
-    if (response.statusCode == 200) {
-      dataNas = json.decode(response.body)['semua'];
-      setState(() {
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
-    return 'success';
-  }
-
-  // Info Covid-19
-  List dataCovid;
-  Future<String> getDataCovid() async {
-    setState(() {
-      isLoadingCovid = true;
-    });
-
-    final res = await http.get(url + "api/covid.php");
-    if (res.statusCode == 200) {
-      dataCovid = json.decode(res.body)['semua'];
-      setState(() {
-        isLoadingCovid = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
-    }
-    return 'success';
-  }
-
-  // List Video
-  List dataVideo;
-  Future<String> getDataVideo() async {
-    setState(() {
-      isLoadingVideo = true;
-    });
-
-    final res = await http.get(url + "api/video.php");
-    if (res.statusCode == 200) {
-      dataVideo = json.decode(res.body)['semua'];
-      setState(() {
-        isLoadingVideo = false;
-      });
-    } else {
-      throw Exception('Failed to load data');
+        dataCovid = json.decode(response.body)['semua'];
+        dataVideo = json.decode(resVid.body)['semua'];
+        dataKab   = json.decode(resKab.body)['semua'];
+        dataKot   = json.decode(resKot.body)['semua'];
+        dataNas   = json.decode(resNas.body)['semua'];
+        
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        developer.log('Gagal mengambil data', name: 'Koneksi Server');
+      }
+    } on SocketException {
+      developer.log('Koneksi internet tidak tersedia', name: 'Koneksi Internet');
     }
     return 'success';
   }
@@ -938,7 +879,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               padding: EdgeInsets.only(top: 40, bottom: 15),
               decoration: new BoxDecoration(
                 color: Colors.blue,
-                boxShadow: [`
+                boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 6.0,
@@ -985,7 +926,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
                     child: CupertinoActivityIndicator())))
                   : _buildListView(dataKab),
-                onRefresh: getBeritaKab,
+                onRefresh: getDataFromJson,
               ),
               RefreshIndicator(
                 child: isLoading
@@ -993,7 +934,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
                     child: CupertinoActivityIndicator())))
                   : _buildListView(dataKot),
-                onRefresh: getBeritaKot,
+                onRefresh: getDataFromJson,
               ),
               RefreshIndicator(
                 child: isLoading 
@@ -1001,7 +942,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
                     child: CupertinoActivityIndicator())))
                   : _buildListView(dataNas),
-                onRefresh: getBeritaNas,
+                onRefresh: getDataFromJson,
               ),
             ]),
         ),
