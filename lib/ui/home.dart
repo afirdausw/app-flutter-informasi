@@ -38,6 +38,7 @@ import 'informasi_tanya.dart';
 import 'profile.dart';
 import 'notifikasi.dart';
 import 'berita_detail.dart';
+import 'event_detail.dart';
 
 
 var isLoading = false;
@@ -86,6 +87,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   // Listing Berita
   List dataKab, dataKot, dataNas;
   List dataCovid, dataVideo;
+  List dataEvent;
 
   Future<String> getDataFromJson() async {
     setState(() {
@@ -93,11 +95,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
 
     try {
-      final response = await http.get(url + "api/covid.php");
-      final resVid = await http.get(url + "api/video.php");
-      final resKab = await http.get(url + "api/berita.php?kategori=kab");
-      final resKot = await http.get(url + "api/berita.php?kategori=kot");
-      final resNas = await http.get(url + "api/berita.php?kategori=nas");
+      final response  = await http.get(url + "api/covid.php");
+      final resVid    = await http.get(url + "api/video.php");
+      final resKab    = await http.get(url + "api/berita.php?kategori=kab");
+      final resKot    = await http.get(url + "api/berita.php?kategori=kot");
+      final resNas    = await http.get(url + "api/berita.php?kategori=nas");
+      final resEvent  = await http.get(url + "api/event.php");
 
       if (response.statusCode == 200) {
 
@@ -106,6 +109,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         dataKab   = json.decode(resKab.body)['semua'];
         dataKot   = json.decode(resKot.body)['semua'];
         dataNas   = json.decode(resNas.body)['semua'];
+        dataEvent = json.decode(resEvent.body)['semua'];
         
         setState(() {
           isLoading = false;
@@ -201,6 +205,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   // Void Main
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.blue,
       statusBarIconBrightness: Brightness.light,
@@ -944,27 +949,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             controller: _controller2,
             children: [
               RefreshIndicator(
-                child: isLoading
-                  ? Center(child: Container(child: CupertinoTheme(
-                    data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                    child: CupertinoActivityIndicator())))
-                  : _buildListView(dataKab),
+                child: _buildListView(dataKab),
                 onRefresh: getDataFromJson,
               ),
               RefreshIndicator(
-                child: isLoading
-                  ? Center(child: Container(child: CupertinoTheme(
-                    data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                    child: CupertinoActivityIndicator())))
-                  : _buildListView(dataKot),
+                child: _buildListView(dataKot),
                 onRefresh: getDataFromJson,
               ),
               RefreshIndicator(
-                child: isLoading 
-                  ? Center(child: Container(child: CupertinoTheme(
-                    data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                    child: CupertinoActivityIndicator())))
-                  : _buildListView(dataNas),
+                child: _buildListView(dataNas),
                 onRefresh: getDataFromJson,
               ),
             ]),
@@ -974,7 +967,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       // ------------------------------- HALAMAN NOTIFIKASI
       new Column(children: <Widget>[
         Stack(alignment: Alignment.topLeft, children: <Widget>[
-          Container(height: 100.0),
+          Container(height: 90.0),
           Positioned(
             width: MediaQuery.of(context).size.width,
             child: Container(
@@ -1001,17 +994,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             ))
         ]),
         Container(
-          height: MediaQuery.of(context).size.height - 156.0,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              CupertinoTheme(
-                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                child: CupertinoActivityIndicator()),
-              SizedBox(height: 10),
-              Text("On Progress...", style: TextStyle(fontSize: 16, fontFamily: "NunitoSemiBold"))
-            ]
+          height: MediaQuery.of(context).size.height - 146.0,
+          padding: EdgeInsets.all(0),
+          child: RefreshIndicator(
+            onRefresh: getDataFromJson,
+            child: new ListView.builder(
+              itemCount: dataEvent.length,
+              itemBuilder: (context, index) {
+                return _eventData(dataEvent[index]);
+              }
+            )
           )
         ),
 
@@ -1607,6 +1599,79 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               style: TextStyle(fontSize: 14, color: ColorPalette.dark), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
           )
         ],
+      )
+    )
+  );
+
+  // EVENT LIST
+  Widget _eventData(dynamic item) => GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context, MaterialPageRoute(
+          builder: (context) => EventDetail(),
+          settings: RouteSettings(
+              arguments: {
+                "gambar"    : url + "uploads/event/" + item['gambar'],
+                "judul"     : item['judul_event'],
+                "deskripsi" : item['deskripsi'],
+                "tanggal"   : item['update_pada']
+              }
+          )
+        )
+      );
+    },
+    child: Container(
+      margin: const EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 15),
+      decoration: BoxDecoration(
+        color: Color(0xffffffff),
+        borderRadius: BorderRadius.circular(3),
+        boxShadow: [BoxShadow(
+          color: Color(0x10000000),
+          blurRadius: 5.0,
+          spreadRadius: 0.5,
+          offset: Offset(1.0, 2.5))
+        ]
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(3), bottomLeft: Radius.circular(3)),
+            child: 
+              new CachedNetworkImage(
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                imageUrl: url + "uploads/event/" + item['gambar'],
+                placeholder: (context, url) => new Container(
+                  height: 80,
+                  width: 80,
+                  child: Center(
+                    child: CupertinoTheme(
+                      data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                      child: CupertinoActivityIndicator()))),
+                errorWidget: (context, url, error) => new Icon(Icons.error),
+                fadeOutDuration: new Duration(seconds: 1),
+                fadeInDuration: new Duration(seconds: 1),
+              )
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width - 118.0,
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  Jiffy(item['waktu'].toString()).format("dd MMMM yyyy, HH:mm"),
+                  style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
+                Text(
+                  item['judul_event'], 
+                  style: TextStyle(fontSize: 14, height: 1.5), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
+              ]
+            )
+          )
+        ]
       )
     )
   );

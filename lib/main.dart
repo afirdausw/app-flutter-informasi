@@ -47,8 +47,8 @@ class _MainAppState extends State<MainApp> {
         child: Image.asset(
           "images/logo_putih.png",
           width: 200.0,
-        ),
-      ),
+        )
+      )
     );
   }
 
@@ -70,25 +70,16 @@ class _MainAppState extends State<MainApp> {
     developer.log(checkValue.toString(), name: 'Value first');
   }
   
-  startHomeScreen() async {
+  startHomeScreen() {
     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) {
       return Home();
     }));
   }
 
-  startIntroScreen() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      checkValue = true;
-      sharedPreferences.setBool("intro", checkValue);
-      sharedPreferences.commit();
-    });
-
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) {
-      return IntroPage();
-    }));
+  startIntroScreen() {
+    Navigator.push(context,
+      MaterialPageRoute(builder: (context) => IntroPage()),
+    );
 
     developer.log(checkValue.toString(), name: 'Checking value of session');
   }

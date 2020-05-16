@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:informasi/model/intro.dart';
 import 'package:informasi/utils/color_palette.dart';
@@ -14,6 +15,10 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+
+  bool checkValue = false;
+  SharedPreferences sharedPreferences;
+
   final List<Intro> introList = [
     Intro(
         image: "images/icon_search.png",
@@ -42,7 +47,9 @@ class _IntroPageState extends State<IntroPage> {
       systemNavigationBarIconBrightness: Brightness.light));
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Swiper.children(
+      body: WillPopScope(
+        onWillPop: _willPop,
+        child: Swiper.children(
           index: 0,
           autoplay: false,
           loop: false,
@@ -54,7 +61,8 @@ class _IntroPageState extends State<IntroPage> {
                   size: 10.0,
                   activeSize: 10.0)),
           control: SwiperControl(iconNext: null, iconPrevious: null),
-          children: _buildPage(context)),
+          children: _buildPage(context))
+      ),
     );
   }
 
@@ -128,11 +136,10 @@ class _IntroPageState extends State<IntroPage> {
                 fontSize: 16,
                 textColor: Colors.white,
                 onPressed: () {
-                  // widget.prefs.setBool('seen', true);
-                  Navigator.push(
-                    context,
+                  Navigator.push(context,
                     MaterialPageRoute(builder: (context) => Home()),
                   );
+                  setSessionIntro();
                 },
                 splashColor: Colors.transparent,
                 borderColor: Colors.transparent,
@@ -142,5 +149,19 @@ class _IntroPageState extends State<IntroPage> {
         ])));
 
     return widgets;
+  }
+
+  Future<bool> _willPop() async {
+    SystemNavigator.pop();
+    return false;
+  }
+
+  setSessionIntro() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      checkValue = true;
+      sharedPreferences.setBool("intro", checkValue);
+      sharedPreferences.commit();
+    });
   }
 }
