@@ -25,6 +25,7 @@ dependencies:
   # --- Add-ons dependencies
   flutter_swiper: any
   flutter_icons: ^1.1.0
+  fluttertoast: ^4.0.1
   carousel_slider: ^1.3.0
   shared_preferences: ^0.5.7
   auto_size_text: ^2.1.0

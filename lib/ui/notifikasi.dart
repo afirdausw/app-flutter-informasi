@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Notifikasi extends StatefulWidget {
   @override
@@ -6,6 +9,27 @@ class Notifikasi extends StatefulWidget {
 }
 
 class _NotifikasiState extends State<Notifikasi> {
+
+  @override
+  void initState() {
+    super.initState();
+    this.runToast();
+  }
+
+  void runToast() {
+    Timer(const Duration(seconds: 2), () {
+      Fluttertoast.showToast(
+        msg: "Hallo, this is my toast message!",
+        toastLength: Toast.LENGTH_LONG,
+        timeInSecForIosWeb: 1,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 14.0);
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

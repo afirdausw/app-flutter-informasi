@@ -14,6 +14,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jiffy/jiffy.dart';
 
 import 'package:informasi/utils/color_palette.dart';
@@ -111,9 +112,27 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         });
       } else {
         developer.log('Gagal mengambil data', name: 'Koneksi Server');
+      
+        Fluttertoast.showToast(
+          msg: "Gagal mengambil data!",
+          toastLength: Toast.LENGTH_LONG,
+          timeInSecForIosWeb: 1,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 14.0);
       }
     } on SocketException {
       developer.log('Koneksi internet tidak tersedia', name: 'Koneksi Internet');
+      
+      Fluttertoast.showToast(
+        msg: "Koneksi internet tidak tersedia!",
+        toastLength: Toast.LENGTH_LONG,
+        timeInSecForIosWeb: 1,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 14.0);
     }
     return 'success';
   }
@@ -151,28 +170,32 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // onWillPop or back pressed
   Future<bool> _onWillPop() async {
-    return (await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => new AlertDialog(
-        title: new Text('Konfirmasi', style: TextStyle(fontSize: 16)),
-        content: new Text('Yakin ingin menutup aplikasi?', style: TextStyle(fontSize: 14)),
-        shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(8.0)),
-        actions: <Widget>[
-          new FlatButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: new Text('Tidak')),
-          new FlatButton(
-            onPressed: () {
-              clearSession();
-              Navigator.of(context).pop(false);
-              SystemNavigator.pop();
-            },
-            child: new Text('Ya, Tutup')),
-        ],
-      ),
-    )) ?? false;
+    _selectedTabIndex == 1 || _selectedTabIndex == 2 || _selectedTabIndex == 3
+    ? setState(() {
+        _selectedTabIndex = 0;
+      })
+    : await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => new AlertDialog(
+          title: new Text('Konfirmasi', style: TextStyle(fontSize: 16)),
+          content: new Text('Yakin ingin menutup aplikasi?', style: TextStyle(fontSize: 14)),
+          shape: new RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(8.0)),
+          actions: <Widget>[
+            new FlatButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: new Text('Tidak')),
+            new FlatButton(
+              onPressed: () {
+                clearSession();
+                Navigator.of(context).pop(false);
+                SystemNavigator.pop();
+              },
+              child: new Text('Ya, Tutup')),
+          ],
+        ),
+      );
   }
 
   // Void Main
