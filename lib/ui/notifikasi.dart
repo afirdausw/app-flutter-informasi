@@ -12,8 +12,6 @@ class Notifikasi extends StatefulWidget {
 
 class _NotifikasiState extends State<Notifikasi> {
 
-  String _message = '';
-
   String _homeScreenText  = "Waiting for token...";
   String _messageText     = "Waiting for message...";
 
@@ -26,12 +24,28 @@ class _NotifikasiState extends State<Notifikasi> {
     super.initState();
     this.runToast();
 
+    this.initFCM();
+  }
+
+  void runToast() {
+    Timer(const Duration(seconds: 2), () {
+      Fluttertoast.showToast(
+        msg: "Hallo, this is my toast message!",
+        toastLength: Toast.LENGTH_LONG,
+        timeInSecForIosWeb: 1,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 14.0);
+    });
+  }
+
+  void initFCM() {
     // FIREBASE FCM
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         setState(() {
           _messageText = "Push Messaging message: $message";
-          _message = message["notification"]["title"];
         });
         print("onMessage: $message");
         showNotification(message["notification"]["title"], message["notification"]["body"]);
@@ -39,7 +53,6 @@ class _NotifikasiState extends State<Notifikasi> {
       onLaunch: (Map<String, dynamic> message) async {
         setState(() {
           _messageText = "Push Messaging message: $message";
-          _message = message["notification"]["title"];
         });
         print("onLaunch: $message");
         showNotification(message["notification"]["title"], message["notification"]["body"]);
@@ -47,7 +60,6 @@ class _NotifikasiState extends State<Notifikasi> {
       onResume: (Map<String, dynamic> message) async {
         setState(() {
           _messageText = "Push Messaging message: $message";
-          _message = message["notification"]["title"];
         });
         print("onResume: $message");
         showNotification(message["notification"]["title"], message["notification"]["body"]);
@@ -69,24 +81,10 @@ class _NotifikasiState extends State<Notifikasi> {
 
     // LOCAL NOTIFICATION
     flutterLocalNotificationsPlugin   = new FlutterLocalNotificationsPlugin();
-    var android                       = new AndroidInitializationSettings('@mipmap/ic_launcher');
+    var android                       = new AndroidInitializationSettings('ic_notification');
     var iOS                           = new IOSInitializationSettings();
     var initSetttings                 = new InitializationSettings(android, iOS);
-    // flutterLocalNotificationsPlugin.initialize(initSetttings, selectNotification: onSelectNotification);
     flutterLocalNotificationsPlugin.initialize(initSetttings);
-  }
-
-  void runToast() {
-    Timer(const Duration(seconds: 2), () {
-      Fluttertoast.showToast(
-        msg: "Hallo, this is my toast message!",
-        toastLength: Toast.LENGTH_LONG,
-        timeInSecForIosWeb: 1,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 14.0);
-    });
   }
 
 
@@ -104,7 +102,6 @@ class _NotifikasiState extends State<Notifikasi> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text("NOTIFIKASI"),
-            Text("Message: $_message"),
             FlatButton(
               color: Colors.green,
               onPressed: () {
@@ -119,31 +116,15 @@ class _NotifikasiState extends State<Notifikasi> {
     );
   }
 
-  Future onSelectNotification(String payload) {
-    debugPrint("payload : $payload");
-    showDialog(
-      context: context,
-      builder: (_) => new AlertDialog(
-        title: new Text('Notification'),
-        content: new Text('$payload')
-      )
-    );
-  }
-
   showNotification(String title, String content) async {
     var android = new AndroidNotificationDetails(
-        '333', 'Onlenkan', 'ONLENKAN DESCRIPTION',
+        '111', 'Onlenkan', 'ONLENKAN INFORMASI',
         priority: Priority.High,
         importance: Importance.Max
     );
     var iOS = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, iOS);
-    await flutterLocalNotificationsPlugin.show(
-        0,
-        title,
-        content,
-        platform,
-        payload: 'Default_Sound');
+    await flutterLocalNotificationsPlugin.show(0, title, content, platform, payload: 'Default_Sound');
   }
 
 }
