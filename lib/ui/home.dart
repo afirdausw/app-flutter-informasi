@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/cupertino.dart';
@@ -35,7 +36,6 @@ import 'informasi_layanan.dart';
 import 'informasi_pengaduan.dart';
 import 'informasi_tanya.dart';
 
-import 'profile.dart';
 import 'notifikasi.dart';
 import 'berita_detail.dart';
 import 'event_detail.dart';
@@ -52,8 +52,11 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
 
+  // FIREBASE
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   // Shared Session
-  bool checkValue = false;
+  bool checkValue, checkLogin;
   SharedPreferences sharedPreferences;
 
   clearSession() async {
@@ -62,6 +65,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       sharedPreferences.clear();
       developer.log("Deleting saved session", name: "SharedPreferences");
     });
+  }
+
+  getUserLogin() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    _firebaseMessaging.subscribeToTopic("/topics/all");
+    setState(() {
+      checkLogin = sharedPreferences.getBool("login");
+      if (checkLogin != null && checkLogin) {
+        checkLogin = true;
+      } else {
+        checkLogin = false;
+      }
+    });
+    developer.log(checkLogin.toString(), name: 'User SignIn with Google!');
   }
 
   // Server URL
@@ -79,6 +96,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     super.initState();
 
     this.getDataFromJson();
+    this.getUserLogin();
 
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
@@ -964,7 +982,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         ),
       ]),
 
-      // ------------------------------- HALAMAN NOTIFIKASI
+      // ------------------------------- HALAMAN EVENT
       new Column(children: <Widget>[
         Stack(alignment: Alignment.topLeft, children: <Widget>[
           Container(height: 90.0),
@@ -1012,7 +1030,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       // ------------------------------- HALAMAN PROFIL
       new Column(children: <Widget>[
         Stack(alignment: Alignment.topLeft, children: <Widget>[
-          Container(height: 100.0),
+          Container(height: 90.0),
           Positioned(
             width: MediaQuery.of(context).size.width,
             child: Container(
@@ -1038,62 +1056,223 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ])
             ))
         ]),
-        SingleChildScrollView(
-          child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: 120),
-            Image.asset("images/icon_search.png", alignment: Alignment.center, width: MediaQuery.of(context).size.width / 1.8),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              alignment: Alignment.center,
-              child: Column(children: <Widget>[
-                SizedBox(height: 40),
-                Text(
-                  "Bantu stop penyebaran Covid-19 dengan melakukan login pada app Onlenkan Informasi.",
-                  textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: ColorPalette.dark, height: 1.6)),
-                SizedBox(height: 20),
-                Text(
-                  "Data Anda akan aman dan tidak pernah diakses,\nkecuali jika Anda dekat dengan kasus positif Covid-19.",
-                  textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
-                SizedBox(height: 20),
-              ])
-            ),
-            OutlineButton(
-              splashColor: Color(0xffCCCCCC),
-              highlightElevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              borderSide: BorderSide(color: ColorPalette.ccc, width: 1),
-              onPressed: () {
-                signInWithGoogle().whenComplete(() {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return Profile();
-                      }
-                    )
-                  );
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
+        checkLogin
+        ? Container(
+            height: MediaQuery.of(context).size.height - 146.0,
+            width: MediaQuery.of(context).size.width,
+            child: ListView(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              shrinkWrap: true,
+              children: <Widget>[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Image(image: AssetImage("images/google_logo.png"), height: 17.0),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Login dengan Google',
-                        style: TextStyle(fontSize: 14, color: ColorPalette.black))
+                    ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                      child: new CachedNetworkImage(
+                        height: 70.0,
+                        width: 70.0,
+                        fit: BoxFit.cover,
+                        imageUrl: imageUrl,
+                        placeholder: (context, url) => Container(
+                          width: 70.0,
+                          height: 70.0,
+                          child: new CupertinoTheme(
+                            data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                            child: CupertinoActivityIndicator())
+                        ),
+                        errorWidget: (context, url, error) => new Icon(Icons.error),
+                        fadeOutDuration: new Duration(seconds: 1),
+                        fadeInDuration: new Duration(seconds: 1)),
+                    ),
+                    SizedBox(width: 15),
+                    Container(
+                      width: 235.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(name,
+                            style: TextStyle(height: 1.5, fontSize: 18, fontFamily: "NunitoSemiBold"),
+                            overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: true),
+                          Text(email,
+                            style: TextStyle(height: 1.5, fontSize: 16),
+                            overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: true)
+                        ]
+                      )
                     )
-                  ]
-                ))
-              )
-          ])
-        )
+                  ],
+                ),
+                GestureDetector(
+                  onTap: () {
+
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(top: 30),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      boxShadow: [BoxShadow(
+                        color: Color(0x08666666),
+                        blurRadius: 1.0,
+                        spreadRadius: 1.0,
+                        offset: Offset(0.0, 2.0)
+                      )]
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          width: 50,
+                          alignment: Alignment.centerLeft,
+                          child: Image.asset("images/qr_code.png", height: 30),
+                        ),
+                        Text("Tampilkan QR Code", style: TextStyle(fontSize: 14))
+                      ],
+                    ),
+                  ),
+                ),
+
+                Container(
+                  margin: EdgeInsets.only(top: 30),
+                  padding: EdgeInsets.symmetric(vertical: 13, horizontal: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [BoxShadow(
+                      color: Color(0x08666666),
+                      blurRadius: 1.0,
+                      spreadRadius: 1.0,
+                      offset: Offset(0.0, 2.0)
+                    )]
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+
+                        },
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              width: 50,
+                              padding: EdgeInsets.only(left: 2, bottom: 3),
+                              alignment: Alignment.centerLeft,
+                              child: Icon(SimpleLineIcons.pencil, size: 21),
+                            ),
+                            Text("Ubah Profil", style: TextStyle(fontSize: 14))
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Divider(height: 1, color: Color(0xAAEEEEEE)),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+
+                        },
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 50,
+                              padding: EdgeInsets.only(left: 2, bottom: 3),
+                              alignment: Alignment.centerLeft,
+                              child: Icon(SimpleLineIcons.info, size: 21),
+                            ),
+                            Text("App Version", style: TextStyle(fontSize: 14))
+                          ],
+                        ),
+                      )
+                    ],
+                  ) 
+                ),
+
+                SizedBox(height: 40),
+                RaisedButton(
+                  onPressed: () {
+                    signOutGoogle();
+                    
+                    setState(() {
+                      checkLogin = false;
+                    });
+                  },
+                  elevation: 2,
+                  color: Colors.redAccent,
+                  padding: EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(13)),
+                  child: Text("Logout",
+                    style: TextStyle(color: Colors.white, height: 1, fontSize: 15, fontFamily: "NunitoSemiBold"))
+                )
+                
+              ],
+            )
+          )
+
+        : SingleChildScrollView(
+            child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(height: 120),
+              Image.asset("images/icon_search.png", alignment: Alignment.center, width: MediaQuery.of(context).size.width / 1.8),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                alignment: Alignment.center,
+                child: Column(children: <Widget>[
+                  SizedBox(height: 40),
+                  Text(
+                    "Bantu stop penyebaran Covid-19 dengan melakukan login pada app Onlenkan Informasi.",
+                    textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: ColorPalette.dark, height: 1.6)),
+                  SizedBox(height: 20),
+                  Text(
+                    "Data Anda akan aman dan tidak pernah diakses,\nkecuali jika Anda dekat dengan kasus positif Covid-19.",
+                    textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
+                  SizedBox(height: 20),
+                ])
+              ),
+              OutlineButton(
+                splashColor: Color(0xffCCCCCC),
+                highlightElevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                borderSide: BorderSide(color: ColorPalette.ccc, width: 1),
+                onPressed: () {
+                  signInWithGoogle().whenComplete(() {
+                    setState(() {
+                      checkLogin = true;
+                      sharedPreferences.setBool("login", checkLogin);
+                      sharedPreferences.commit();
+                    });
+
+                    // Navigator.of(context).push(
+                    //   MaterialPageRoute(
+                    //     builder: (context) {
+                    //       return Profile();
+                    //     }
+                    //   )
+                    // );
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Image(image: AssetImage("images/google_logo.png"), height: 17.0),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'Login dengan Google',
+                          style: TextStyle(fontSize: 14, color: ColorPalette.black))
+                      )
+                    ]
+                  ))
+                )
+            ])
+          )
       ])
     ];
 

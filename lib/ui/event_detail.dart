@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:informasi/utils/color_palette.dart';
 
@@ -48,7 +47,8 @@ class _EventDetailState extends State<EventDetail> {
 
   BannerAd buildBannerAd() {
     return BannerAd(
-      adUnitId: getBannerAdUnitId(),
+      // adUnitId: getBannerAdUnitId(),
+      adUnitId: BannerAd.testAdUnitId,
       size: AdSize.banner,
       listener: (MobileAdEvent event) {
         print("Banner $event");

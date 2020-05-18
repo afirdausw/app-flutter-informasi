@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:informasi/ui/signin.dart';
-import 'package:informasi/ui/signin_google.dart';
+
+import 'home.dart';
+import 'signin_google.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -71,7 +72,7 @@ class _ProfileState extends State<Profile> {
                 onPressed: () {
                   signOutGoogle();
                   Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
-                    return Signin();
+                    return Home();
                   }), ModalRoute.withName('/'));
                 },
                 color: Colors.deepPurple,

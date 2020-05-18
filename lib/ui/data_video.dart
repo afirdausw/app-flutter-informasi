@@ -61,7 +61,8 @@ class VideoState extends State<Video> {
 
   InterstitialAd buildInterstitialAd() {
     return InterstitialAd(
-      adUnitId: getInterstitialAdUnitId(),
+      // adUnitId: getInterstitialAdUnitId(),
+      adUnitId: InterstitialAd.testAdUnitId,
       listener: (MobileAdEvent event) {
         if (event == MobileAdEvent.failedToLoad) {
           myInterstitial..load();

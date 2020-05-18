@@ -48,7 +48,8 @@ class _BeritaDetailState extends State<BeritaDetail> {
 
   BannerAd buildBannerAd() {
     return BannerAd(
-      adUnitId: getBannerAdUnitId(),
+      // adUnitId: getBannerAdUnitId(),
+      adUnitId: BannerAd.testAdUnitId,
       size: AdSize.banner,
       listener: (MobileAdEvent event) {
         print("Banner $event");

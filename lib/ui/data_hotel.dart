@@ -62,7 +62,8 @@ class HotelState extends State<Hotel> {
 
   InterstitialAd buildInterstitialAd() {
     return InterstitialAd(
-      adUnitId: getInterstitialAdUnitId(),
+      // adUnitId: getInterstitialAdUnitId(),
+      adUnitId: InterstitialAd.testAdUnitId,
       listener: (MobileAdEvent event) {
         if (event == MobileAdEvent.failedToLoad) {
           myInterstitial..load();
