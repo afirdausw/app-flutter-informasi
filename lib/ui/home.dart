@@ -38,12 +38,14 @@ import 'informasi_tanya.dart';
 
 import 'notifikasi.dart';
 import 'berita_detail.dart';
+import 'berita_detail_banner.dart';
 import 'event_detail.dart';
 
 
-var isLoading = false;
-var isLoadingCovid = false;
-var isLoadingVideo = false;
+var isLoading = true;
+var isLoadingBanner = true;
+var isLoadingCovid = true;
+var isLoadingVideo = true;
 
 class Home extends StatefulWidget {
   @override
@@ -69,7 +71,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   getUserLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    _firebaseMessaging.subscribeToTopic("/topics/all");
+    _firebaseMessaging.subscribeToTopic("all");
     setState(() {
       checkLogin = sharedPreferences.getBool("login");
       if (checkLogin != null && checkLogin) {
@@ -82,10 +84,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   // Server URL
-  final String url = "http://10.0.2.2/onlenkan-informasi/";
+  // final String url = "http://10.0.2.2/onlenkan-informasi/";
   // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  // final String url = "https://informasi.onlenkan.org/";
+  final String url = "https://informasi.onlenkan.org/";
 
   // Tab Bar
   TabController _controller;
@@ -96,6 +98,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     super.initState();
 
     this.getDataFromJson();
+    this.getBannerJson();
     this.getUserLogin();
 
     _controller = new TabController(length: 3, vsync: this);
@@ -131,6 +134,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         
         setState(() {
           isLoading = false;
+          isLoadingCovid = false;
+          isLoadingVideo = false;
         });
       } else {
         developer.log('Gagal mengambil data', name: 'Koneksi Server');
@@ -173,21 +178,31 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   int _current = 0;
 
-  List imgList = [
-    'images/carousel/slide_1.jpg',
-    'images/carousel/slide_2.jpg',
-    'images/carousel/slide_3.jpg',
-    'images/carousel/slide_4.jpg',
-    'images/carousel/slide_5.jpg',
-    'images/carousel/slide_6.jpg'
-  ];
+  List bannerList, bannerData = [];
+  Future<String> getBannerJson() async {
+    setState(() {
+      isLoadingBanner = true;
+    });
 
-  List<T> map<T>(List list, Function handler) {
-    List<T> result = [];
-    for (var i = 0; i < list.length; i++) {
-      result.add(handler(i, list[i]));
+    try {
+      final resp  = await http.get(url + "api/banner.php");
+
+      if (resp.statusCode == 200) {
+        setState(() {
+          isLoadingBanner = false;
+        });
+
+        bannerList = json.decode(resp.body)['semua'];
+
+        for (var i = 0; i < bannerList.length; i++) {
+          bannerData.add(bannerList[i]['banner'] + ";" + bannerList[i]['link']);
+        }
+        developer.log(bannerData.toString(), name: 'Banner image list');
+      }
+    } on SocketException {
+      developer.log('Koneksi internet tidak tersedia', name: 'Koneksi Internet');
     }
-    return result;
+    return 'success';
   }
 
   // onWillPop or back pressed
@@ -317,7 +332,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                 _current = index;
                               });
                             },
-                            items: imgList.map((imgUrl) {
+                            items: bannerData.map((dataList) {
                               return Builder(builder: (BuildContext context) {
                                 return Container(
                                   width: MediaQuery.of(context).size.width,
@@ -325,11 +340,45 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius:BorderRadius.all(Radius.circular(8.0))),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.asset(
-                                      imgUrl,
-                                      fit: BoxFit.cover)
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      String link = dataList.substring(dataList.indexOf(';') + 1);
+                                      
+                                      if (link.trim() != '') {
+                                        Navigator.push(
+                                          context, MaterialPageRoute(
+                                            builder: (context) => BeritaDetailBanner(),
+                                            settings: RouteSettings(
+                                                arguments: {
+                                                  "link" : link.trim()
+                                                }
+                                            )
+                                          )
+                                        );
+                                      } else {
+                                        Fluttertoast.showToast(
+                                          msg: "Tidak ada detail khusus untuk gambar ini!",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          timeInSecForIosWeb: 1,
+                                          gravity: ToastGravity.TOP,
+                                          backgroundColor: Colors.red[900],
+                                          textColor: Colors.white,
+                                          fontSize: 14.0);
+                                      }
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: CachedNetworkImage(
+                                        fit: BoxFit.cover,
+                                        imageUrl: url + "uploads/banner/" + dataList.substring(0, dataList.indexOf(';')),
+                                        errorWidget: (context, url, error) => new Icon(Icons.error),
+                                        placeholder: (context, url) => new Container(
+                                          child: Center(
+                                            child: CupertinoTheme(
+                                              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                                              child: CupertinoActivityIndicator()))),
+                                      )
+                                    )
                                   )
                                 );
                               });
@@ -829,8 +878,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                         )
                                       ),
                                       new Container(
-                                        margin: EdgeInsets.only(top: 10),
                                         height: 380.0,
+                                        color: Colors.white,
+                                        margin: EdgeInsets.only(top: 10),
                                         child: TabBarView(
                                           controller: _controller,
                                           children: [
@@ -1016,11 +1066,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           padding: EdgeInsets.all(0),
           child: RefreshIndicator(
             onRefresh: getDataFromJson,
-            child: new ListView.builder(
-              itemCount: dataEvent.length,
-              itemBuilder: (context, index) {
-                return _eventData(dataEvent[index]);
-              }
+            child: isLoading
+              ? CupertinoTheme(
+                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                child: CupertinoActivityIndicator())
+              : new ListView.builder(
+                itemCount: dataEvent.length,
+                itemBuilder: (context, index) {
+                  return _eventData(dataEvent[index]);
+                }
             )
           )
         ),

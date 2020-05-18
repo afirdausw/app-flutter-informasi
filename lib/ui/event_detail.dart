@@ -125,7 +125,7 @@ class _EventDetailState extends State<EventDetail> {
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(intent['deskripsi'], style: TextStyle(fontSize: 16, height: 1.5)),
             ),
-            SizedBox(height: 60)
+            SizedBox(height: 70)
           ]
         )
       )
