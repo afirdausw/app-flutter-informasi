@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Sign in google
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -10,6 +11,7 @@ String email;
 String imageUrl;
 
 Future<String> signInWithGoogle() async {
+  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
   final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
 
@@ -30,17 +32,17 @@ Future<String> signInWithGoogle() async {
   email = user.email;
   imageUrl = user.photoUrl;
 
-  // Only taking the first part of the name, i.e., First Name
-  if (name.contains(" ")) {
-    name = name.substring(0, name.indexOf(" "));
-  }
-
   assert(!user.isAnonymous);
   assert(await user.getIdToken() != null);
 
   final FirebaseUser currentUser = await _auth.currentUser();
   assert(user.uid == currentUser.uid);
-
+  
+  sharedPreferences.setString("google_name", name);
+  sharedPreferences.setString("google_email", email);
+  sharedPreferences.setString("google_photo", imageUrl);
+  sharedPreferences.commit(); 
+  
   return 'singInWithGoogle succeeded: $user';
 }
 

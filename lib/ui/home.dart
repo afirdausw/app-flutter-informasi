@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -54,12 +55,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
 
-  // FIREBASE
+  // FIREBASE + Notification
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   // Shared Session
   bool checkValue, checkLogin;
   SharedPreferences sharedPreferences;
+  String googleName, googleEmail, googlePhoto;
 
   clearSession() async {
     sharedPreferences = await SharedPreferences.getInstance();
@@ -71,11 +74,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   getUserLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    _firebaseMessaging.subscribeToTopic("all");
     setState(() {
       checkLogin = sharedPreferences.getBool("login");
       if (checkLogin != null && checkLogin) {
         checkLogin = true;
+        googleName  = sharedPreferences.getString("google_name");
+        googleEmail = sharedPreferences.getString("google_email");
+        googlePhoto = sharedPreferences.getString("google_photo");
       } else {
         checkLogin = false;
       }
@@ -85,9 +90,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  // final String url = "http://192.168.43.17/onlenkan-informasi/";
+  final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  final String url = "https://informasi.onlenkan.org/";
+  // final String url = "https://informasi.onlenkan.org/";
 
   // Tab Bar
   TabController _controller;
@@ -100,9 +105,58 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     this.getDataFromJson();
     this.getBannerJson();
     this.getUserLogin();
+    this.initFCM();
 
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
+  }
+
+  // FIREBASE Firebase Cloud Message
+  void initFCM() {
+    _firebaseMessaging.subscribeToTopic("all");
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        showNotification(message["notification"]["title"], message["notification"]["body"]);
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+        showNotification(message["notification"]["title"], message["notification"]["body"]);
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+        showNotification(message["notification"]["title"], message["notification"]["body"]);
+      },
+    );
+
+    _firebaseMessaging.requestNotificationPermissions(const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.onIosSettingsRegistered.listen((IosNotificationSettings settings) {
+      print("Settings registered: $settings");
+    });
+
+    _firebaseMessaging.getToken().then((String token) {
+      assert(token != null);
+      print("Push Messaging token: $token");
+    });
+
+    // LOCAL NOTIFICATION
+    flutterLocalNotificationsPlugin   = new FlutterLocalNotificationsPlugin();
+    var android                       = new AndroidInitializationSettings('ic_notification');
+    var iOS                           = new IOSInitializationSettings();
+    var initSetttings                 = new InitializationSettings(android, iOS);
+    flutterLocalNotificationsPlugin.initialize(initSetttings);
+  }
+
+  // Local Notification
+  showNotification(String title, String content) async {
+    var android = new AndroidNotificationDetails(
+        '111', 'Onlenkan', 'ONLENKAN INFORMASI',
+        priority: Priority.High,
+        importance: Importance.Max
+    );
+    var iOS = new IOSNotificationDetails();
+    var platform = new NotificationDetails(android, iOS);
+    await flutterLocalNotificationsPlugin.show(0, title, content, platform, payload: 'Default_Sound');
   }
 
   // Listing Berita
@@ -363,7 +417,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           gravity: ToastGravity.TOP,
                                           backgroundColor: Colors.red[900],
                                           textColor: Colors.white,
-                                          fontSize: 14.0);
+                                          fontSize: 13.0);
                                       }
                                     },
                                     child: ClipRRect(
@@ -1127,7 +1181,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         height: 70.0,
                         width: 70.0,
                         fit: BoxFit.cover,
-                        imageUrl: imageUrl,
+                        imageUrl: googlePhoto == '' ? url + 'img/logo.png' : googlePhoto,
                         placeholder: (context, url) => Container(
                           width: 70.0,
                           height: 70.0,
@@ -1146,10 +1200,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Text(name,
+                          Text(googleName,
                             style: TextStyle(height: 1.5, fontSize: 18, fontFamily: "NunitoSemiBold"),
                             overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: true),
-                          Text(email,
+                          Text(googleEmail,
                             style: TextStyle(height: 1.5, fontSize: 16),
                             overflow: TextOverflow.ellipsis, maxLines: 1, softWrap: true)
                         ]
@@ -1298,15 +1352,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       checkLogin = true;
                       sharedPreferences.setBool("login", checkLogin);
                       sharedPreferences.commit();
+                      print(imageUrl);
                     });
-
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) {
-                    //       return Profile();
-                    //     }
-                    //   )
-                    // );
                   });
                 },
                 child: Padding(
