@@ -118,6 +118,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   // Tab Bar
   TabController _controller;
   TabController _controller2;
+  TabController _controller3;
 
   @override
   void initState() {
@@ -130,8 +131,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     this.initVersion();
     this.getBadge();
 
-    _controller = new TabController(length: 3, vsync: this);
-    _controller2 = new TabController(length: 3, vsync: this);
+    _controller   = new TabController(length: 3, vsync: this);
+    _controller2  = new TabController(length: 3, vsync: this);
+    _controller3  = new TabController(length: 2, vsync: this);
   }
 
   // PACKAGE INFO
@@ -212,7 +214,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   // Listing Berita
   List dataKab, dataKot, dataNas;
   List dataCovid, dataVideo;
-  List dataEvent;
+  List dataEvent, dataEventBerlalu;
 
   Future<String> getDataFromJson() async {
     setState(() {
@@ -225,16 +227,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       final resKab    = await http.get(url + "api/berita.php?kategori=kab");
       final resKot    = await http.get(url + "api/berita.php?kategori=kot");
       final resNas    = await http.get(url + "api/berita.php?kategori=nas");
-      final resEvent  = await http.get(url + "api/event.php");
+      final resEvent  = await http.get(url + "api/event.php?get=terbaru");
+      final resEventB = await http.get(url + "api/event.php?get=berlalu");
 
       if (response.statusCode == 200) {
 
-        dataCovid = json.decode(response.body)['semua'];
-        dataVideo = json.decode(resVid.body)['semua'];
-        dataKab   = json.decode(resKab.body)['semua'];
-        dataKot   = json.decode(resKot.body)['semua'];
-        dataNas   = json.decode(resNas.body)['semua'];
-        dataEvent = json.decode(resEvent.body)['semua'];
+        dataCovid         = json.decode(response.body)['semua'];
+        dataVideo         = json.decode(resVid.body)['semua'];
+        dataKab           = json.decode(resKab.body)['semua'];
+        dataKot           = json.decode(resKot.body)['semua'];
+        dataNas           = json.decode(resNas.body)['semua'];
+        dataEvent         = json.decode(resEvent.body)['semua'];
+        dataEventBerlalu  = json.decode(resEventB.body)['semua'];
         
         setState(() {
           isLoading = false;
@@ -1150,7 +1154,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       // ------------------------------- HALAMAN EVENT
       new Column(children: <Widget>[
         Stack(alignment: Alignment.topLeft, children: <Widget>[
-          Container(height: 90.0),
+          Container(height: 86.0),
           Positioned(
             width: MediaQuery.of(context).size.width,
             child: Container(
@@ -1176,22 +1180,49 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               ])
             ))
         ]),
-        Container(
-          height: MediaQuery.of(context).size.height - 146.0,
-          padding: EdgeInsets.all(0),
-          child: isLoading
-            ? CupertinoTheme(
-              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-              child: CupertinoActivityIndicator())
-            : RefreshIndicator(
-                onRefresh: getDataFromJson,
-                child: new ListView.builder(
-                  itemCount: dataEvent.length,
-                  itemBuilder: (context, index) {
-                    return _eventData(dataEvent[index]);
-                  })
-              )
+        new Container(
+          color: Colors.blue,
+          constraints: BoxConstraints.expand(height: 50),
+          child: TabBar(
+            controller: _controller3,
+            labelColor: Colors.white,
+            labelStyle: TextStyle(fontFamily: "NunitoSemiBold"),
+            unselectedLabelColor: Colors.white60,
+            indicator: UnderlineTabIndicator(
+              borderSide: BorderSide(width: 4, color:Colors.white)),
+            tabs: [
+              Tab(text: "Akan Datang"),
+              Tab(text: "Berlalu")
+            ]
+          ),
         ),
+        new Container(
+          height: MediaQuery.of(context).size.height - 192.0,
+          child: TabBarView(
+            controller: _controller3,
+            children: [
+              RefreshIndicator(
+                onRefresh: getDataFromJson,
+                child: dataEvent.isEmpty
+                  ? _dataKosong("Event terbaru")
+                  : new ListView.builder(
+                      itemCount: dataEvent.length,
+                      itemBuilder: (context, index) {
+                        return _eventData(dataEvent[index]);
+                      })
+              ),
+              RefreshIndicator(
+                onRefresh: getDataFromJson,
+                child: dataEventBerlalu.isEmpty
+                  ? _dataKosong("Event")
+                  : new ListView.builder(
+                      itemCount: dataEventBerlalu.length,
+                      itemBuilder: (context, index) {
+                        return _eventData(dataEventBerlalu[index]);
+                      }),
+              )
+            ])
+        )
 
       ]),
 
@@ -1809,7 +1840,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      itemCount: 4,
+      itemCount: dataBerita.length <= 4 ? dataBerita.length : 4,
       itemBuilder: (context, index) {
         return _buildImageColumnSmall(dataBerita[index]);
       }
@@ -2044,4 +2075,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       )
     )
   );
+
+  // WHERE EMPTY DATA 
+  Widget _dataKosong(String pesan) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(FontAwesome5.sad_tear, size: 50, color: Color(0x90CCCCCC)),
+        Text("Belum ada $pesan.",
+          style: TextStyle(color: ColorPalette.dark, fontSize: 16, fontFamily: "NunitoSemiBold", height: 3)),
+        SizedBox(height: 60),
+      ],
+    );
+  }
 }
