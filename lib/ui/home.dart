@@ -1198,30 +1198,34 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         ),
         new Container(
           height: MediaQuery.of(context).size.height - 192.0,
-          child: TabBarView(
-            controller: _controller3,
-            children: [
-              RefreshIndicator(
-                onRefresh: getDataFromJson,
-                child: dataEvent.isEmpty
-                  ? _dataKosong("Event terbaru")
-                  : new ListView.builder(
-                      itemCount: dataEvent.length,
-                      itemBuilder: (context, index) {
-                        return _eventData(dataEvent[index]);
-                      })
-              ),
-              RefreshIndicator(
-                onRefresh: getDataFromJson,
-                child: dataEventBerlalu.isEmpty
-                  ? _dataKosong("Event")
-                  : new ListView.builder(
-                      itemCount: dataEventBerlalu.length,
-                      itemBuilder: (context, index) {
-                        return _eventData(dataEventBerlalu[index]);
-                      }),
-              )
-            ])
+          child: isLoading
+            ? CupertinoTheme(
+              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+              child: CupertinoActivityIndicator())
+            : TabBarView(
+                controller: _controller3,
+                children: [
+                  RefreshIndicator(
+                    onRefresh: getDataFromJson,
+                    child: dataEvent.isEmpty
+                      ? _dataKosong("Event terbaru")
+                      : new ListView.builder(
+                          itemCount: dataEvent.length,
+                          itemBuilder: (context, index) {
+                            return _eventData(dataEvent[index]);
+                          })
+                  ),
+                  RefreshIndicator(
+                    onRefresh: getDataFromJson,
+                    child: dataEventBerlalu.isEmpty
+                      ? _dataKosong("Event")
+                      : new ListView.builder(
+                          itemCount: dataEventBerlalu.length,
+                          itemBuilder: (context, index) {
+                            return _eventData(dataEventBerlalu[index]);
+                          }),
+                  )
+                ])
         )
 
       ]),
