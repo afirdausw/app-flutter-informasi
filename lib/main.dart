@@ -67,7 +67,7 @@ class _MainAppState extends State<MainApp> {
         checkValue = false;
       }
     });
-    developer.log(checkValue.toString(), name: 'Value first');
+    developer.log(checkValue.toString(), name: 'Goto home screen is');
   }
   
   startHomeScreen() {

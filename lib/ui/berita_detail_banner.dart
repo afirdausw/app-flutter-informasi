@@ -102,7 +102,6 @@ class _BeritaDetailBannerState extends State<BeritaDetailBanner> {
       if (response.statusCode == 200) {
 
         data = json.decode(response.body)['semua'];
-        print(data);
         
         setState(() {
           isLoading = false;
@@ -163,9 +162,13 @@ class _BeritaDetailBannerState extends State<BeritaDetailBanner> {
         child: new CachedNetworkImage(
           fit: BoxFit.cover,
           imageUrl: url + "uploads/berita/" + item['gambar'],
-          placeholder: (context, url) => new CupertinoTheme(
-            data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-            child: CupertinoActivityIndicator()),
+          placeholder: (context, url) => Container(
+            alignment: Alignment.center,
+            height: 100,
+            width: double.infinity,
+            child: new CupertinoTheme(
+              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+              child: CupertinoActivityIndicator())),
           errorWidget: (context, url, error) => new Icon(Icons.error),
           fadeOutDuration: new Duration(seconds: 1),
           fadeInDuration: new Duration(seconds: 3))

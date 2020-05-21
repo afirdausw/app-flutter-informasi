@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:informasi/utils/color_palette.dart';
 import 'package:jiffy/jiffy.dart';
@@ -24,9 +25,11 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  // final String url = "http://192.168.43.17/onlenkan-informasi/";
+   final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  final String url = "https://informasi.onlenkan.org/";
+  // final String url = "https://informasi.onlenkan.org/";
+
+  SharedPreferences sharedPreferences;
 
   var isLoading = true;
   TabController _controller;
@@ -37,6 +40,7 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
     super.initState();
 
     this.getDataFromJson();
+    this.removeBadge();
 
     _controller = new TabController(length: 2, vsync: this);
   }
@@ -84,6 +88,13 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
     return 'success';
   }
 
+  removeBadge() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      sharedPreferences.remove("badgeNotif");
+    });
+    developer.log(sharedPreferences.getInt("badgeNotif").toString(), name: "Session Badge Notif");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +122,7 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
           ),
         ),
         new Container(
-          height: MediaQuery.of(context).size.height - 130.0,
+          height: MediaQuery.of(context).size.height - 132.0,
           child: TabBarView(
             controller: _controller,
             children: [

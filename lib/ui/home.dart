@@ -64,12 +64,32 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   bool checkValue, checkLogin;
   SharedPreferences sharedPreferences;
   String googleName, googleEmail, googlePhoto;
+  int counterBadge, _counterBadge;
+
+  updateBadge() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+        counterBadge  = sharedPreferences.getInt("badgeNotif");
+        _counterBadge = counterBadge != null ? counterBadge : 1;
+
+        sharedPreferences.setInt("badgeNotif", (_counterBadge + 1));
+
+        developer.log(counterBadge.toString(), name: "Session Badge Notif");
+    });
+  }
+
+  getBadge() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+        _counterBadge  = sharedPreferences.getInt("badgeNotif");
+        developer.log(_counterBadge.toString(), name: "Session Badge awal Notif");
+    });
+  }
 
   clearSession() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       sharedPreferences.remove("intro");
-      // sharedPreferences.clear();
     });
   }
 
@@ -91,9 +111,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  // final String url = "http://192.168.43.17/onlenkan-informasi/";
+  final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  final String url = "https://informasi.onlenkan.org/";
+  // final String url = "https://informasi.onlenkan.org/";
 
   // Tab Bar
   TabController _controller;
@@ -108,6 +128,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     this.getUserLogin();
     this.initFCM();
     this.initVersion();
+    this.getBadge();
 
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
@@ -126,18 +147,22 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // FIREBASE Firebase Cloud Message
   void initFCM() {
+
     // LOCAL NOTIFICATION
     flutterLocalNotificationsPlugin   = new FlutterLocalNotificationsPlugin();
     var android                       = new AndroidInitializationSettings('ic_notification');
     var iOS                           = new IOSInitializationSettings();
     var initSetttings                 = new InitializationSettings(android, iOS);
-    flutterLocalNotificationsPlugin.initialize(initSetttings);
+    flutterLocalNotificationsPlugin.initialize(initSetttings, onSelectNotification: onSelectNotification);
+    // flutterLocalNotificationsPlugin.initialize(initSetttings);
 
     _firebaseMessaging.subscribeToTopic("all");
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
         showNotification(message["notification"]["title"], message["notification"]["body"]);
+
+        updateBadge();
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
@@ -161,6 +186,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   // Local Notification
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return new AlertDialog(
+          title: Text("PayLoad"),
+          content: Text("Payload : $payload"),
+        );
+      },
+    );
+  }
+
   showNotification(String title, String content) async {
     var android = new AndroidNotificationDetails(
         '111', 'Onlenkan', 'ONLENKAN INFORMASI',
@@ -228,6 +265,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         textColor: Colors.white,
         fontSize: 14.0);
     }
+    getBadge();
     return 'success';
   }
 
@@ -330,15 +368,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: <Widget>[
-                Image.asset("images/logo_putih.png", height: 25),
+                GestureDetector(
+                  onTap: () {
+                    updateBadge();
+                  },
+                  child: Image.asset("images/logo_putih.png", height: 25),
+                ),
                 Stack(
                   children: <Widget>[
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Notifikasi())
-                        );
-                      },
+                      onTap: () =>
+                        Navigator.of(context).push(
+                          new MaterialPageRoute(builder: (_) => 
+                          new Notifikasi())
+                        ).then((val) => val ? getBadge() : null),
                       child: Container(
                         width: 30,
                         height: 30,
@@ -347,17 +390,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Positioned(
                       top: 1.0,
                       right: 0.0,
-                      child: Container(
-                        padding: EdgeInsets.all(1.0),
-                        decoration: BoxDecoration(
-                          color: Color(0xCCFF0000),
-                          shape: BoxShape.circle),
-                        constraints: BoxConstraints(
-                          minWidth: 14.0,
-                          minHeight: 14.0),
-                        child: Center(
-                          child: Text("6", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 8.0)))
-                      )
+                      child: _counterBadge == null
+                        ? Container()
+                        : Container(
+                            padding: EdgeInsets.all(1.0),
+                            decoration: BoxDecoration(
+                              color: Color(0xCCFF0000),
+                              shape: BoxShape.circle),
+                            constraints: BoxConstraints(
+                              minWidth: 14.0,
+                              minHeight: 14.0),
+                            child: Center(
+                              child: Text('$_counterBadge',
+                                textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 8.0))))
                     )
                   ]
                 )
@@ -370,663 +415,666 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               padding: EdgeInsets.only(top: 10),
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
-              child: ListView(children: <Widget>[
-                new Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.only(bottom: 150),
-                  child: isLoading
-                    ? Center(child:CupertinoTheme(
-                        data: CupertinoTheme.of(context).copyWith(brightness: Brightness.dark),
-                        child: CupertinoActivityIndicator()))
-                    : new Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          // CAROUSEL IMAGE
-                          carouselSlider = new CarouselSlider(
-                            height: 160.0,
-                            initialPage: 0,
-                            enlargeCenterPage: true,
-                            autoPlay: true,
-                            reverse: false,
-                            enableInfiniteScroll: true,
-                            autoPlayInterval: Duration(seconds: 5),
-                            autoPlayAnimationDuration: Duration(milliseconds: 2000),
-                            pauseAutoPlayOnTouch: Duration(seconds: 10),
-                            scrollDirection: Axis.horizontal,
-                            onPageChanged: (index) {
-                              setState(() {
-                                _current = index;
-                              });
-                            },
-                            items: bannerData.map((dataList) {
-                              return Builder(builder: (BuildContext context) {
-                                return Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  margin: EdgeInsets.symmetric(horizontal: 10.0),
-                                  decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius:BorderRadius.all(Radius.circular(8.0))),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      String link = dataList.substring(dataList.indexOf(';') + 1);
-                                      
-                                      if (link.trim() != '') {
-                                        Navigator.push(
-                                          context, MaterialPageRoute(
-                                            builder: (context) => BeritaDetailBanner(),
-                                            settings: RouteSettings(
-                                                arguments: {
-                                                  "link" : link.trim()
-                                                }
+              child: RefreshIndicator(
+                onRefresh: getDataFromJson,
+                child: ListView(children: <Widget>[
+                  new Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.only(bottom: 150),
+                    child: isLoading
+                      ? Center(child:CupertinoTheme(
+                          data: CupertinoTheme.of(context).copyWith(brightness: Brightness.dark),
+                          child: CupertinoActivityIndicator()))
+                      : new Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            // CAROUSEL IMAGE
+                            carouselSlider = new CarouselSlider(
+                              height: 160.0,
+                              initialPage: 0,
+                              enlargeCenterPage: true,
+                              autoPlay: true,
+                              reverse: false,
+                              enableInfiniteScroll: true,
+                              autoPlayInterval: Duration(seconds: 5),
+                              autoPlayAnimationDuration: Duration(milliseconds: 2000),
+                              pauseAutoPlayOnTouch: Duration(seconds: 10),
+                              scrollDirection: Axis.horizontal,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _current = index;
+                                });
+                              },
+                              items: bannerData.map((dataList) {
+                                return Builder(builder: (BuildContext context) {
+                                  return Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    margin: EdgeInsets.symmetric(horizontal: 10.0),
+                                    decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius:BorderRadius.all(Radius.circular(8.0))),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        String link = dataList.substring(dataList.indexOf(';') + 1);
+                                        
+                                        if (link.trim() != '') {
+                                          Navigator.push(
+                                            context, MaterialPageRoute(
+                                              builder: (context) => BeritaDetailBanner(),
+                                              settings: RouteSettings(
+                                                  arguments: {
+                                                    "link" : link.trim()
+                                                  }
+                                              )
+                                            )
+                                          );
+                                        } else {
+                                          Fluttertoast.showToast(
+                                            msg: "Tidak ada detail khusus untuk gambar ini!",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            timeInSecForIosWeb: 1,
+                                            gravity: ToastGravity.TOP,
+                                            backgroundColor: Colors.red[900],
+                                            textColor: Colors.white,
+                                            fontSize: 13.0);
+                                        }
+                                      },
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.0),
+                                        child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          imageUrl: url + "uploads/banner/" + dataList.substring(0, dataList.indexOf(';')),
+                                          errorWidget: (context, url, error) => new Icon(Icons.error),
+                                          placeholder: (context, url) => new Container(
+                                            child: Center(
+                                              child: CupertinoTheme(
+                                                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                                                child: CupertinoActivityIndicator()))),
+                                        )
+                                      )
+                                    )
+                                  );
+                                });
+                              }).toList(),
+                            ),
+                            
+                            new SizedBox(height: 20),
+                            
+                            // INFORMASI COVID
+                            new Container(
+                              height: 390,
+                              color: ColorPalette.white,
+                              child:
+                                isLoadingCovid
+                                ? Center(child: CupertinoTheme(
+                                  data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                                  child: CupertinoActivityIndicator()))
+                                : new ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: 1,
+                                  itemBuilder: (context, index) {
+                                    return _covidData(dataCovid[index]);
+                                  }
+                                )
+                            ),
+                          
+                            // KONTEN
+                            new Container(
+                              color: Color(0xffF5F5F5),
+                              padding: EdgeInsets.only(top: 20),
+                              child: new Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+
+                                  new Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(
+                                      "Pusat Layanan & Informasi", 
+                                      style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),
+                                  ),
+
+                                  // MENU
+                                  // BARIS 1
+                                  Container(
+                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => DestinasiWisata()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(Ionicons.ios_airplane, size: 30, color: Colors.blue))
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text("Destinasi Wisata", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
                                             )
                                           )
-                                        );
-                                      } else {
-                                        Fluttertoast.showToast(
-                                          msg: "Tidak ada detail khusus untuk gambar ini!",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          timeInSecForIosWeb: 1,
-                                          gravity: ToastGravity.TOP,
-                                          backgroundColor: Colors.red[900],
-                                          textColor: Colors.white,
-                                          fontSize: 13.0);
-                                      }
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: CachedNetworkImage(
-                                        fit: BoxFit.cover,
-                                        imageUrl: url + "uploads/banner/" + dataList.substring(0, dataList.indexOf(';')),
-                                        errorWidget: (context, url, error) => new Icon(Icons.error),
-                                        placeholder: (context, url) => new Container(
-                                          child: Center(
-                                            child: CupertinoTheme(
-                                              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                                              child: CupertinoActivityIndicator()))),
-                                      )
-                                    )
-                                  )
-                                );
-                              });
-                            }).toList(),
-                          ),
-                          
-                          new SizedBox(height: 20),
-                          
-                          // INFORMASI COVID
-                          new Container(
-                            height: 390,
-                            color: ColorPalette.white,
-                            child:
-                              isLoadingCovid
-                              ? Center(child: CupertinoTheme(
-                                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                                child: CupertinoActivityIndicator()))
-                              : new ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: 1,
-                                itemBuilder: (context, index) {
-                                  return _covidData(dataCovid[index]);
-                                }
-                              )
-                          ),
-                        
-                          // KONTEN
-                          new Container(
-                            color: Color(0xffF5F5F5),
-                            padding: EdgeInsets.only(top: 20),
-                            child: new Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-
-                                new Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "Pusat Layanan & Informasi", 
-                                    style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),
-                                ),
-
-                                // MENU
-                                // BARIS 1
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => DestinasiWisata()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => Travel()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(Ionicons.ios_car, size: 28, color: Colors.blue))
                                                 ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(Ionicons.ios_airplane, size: 30, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Destinasi Wisata", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => Travel()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(Ionicons.ios_car, size: 28, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Travel", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => Hotel()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(Ionicons.ios_bed, size: 26, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Hotel", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => OlehOleh()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.utensils, size: 21, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Oleh - Oleh", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                  ])
-                                ),
-                                // BARIS 2
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => RumahSakit())
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.hospital, size: 25, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Rumah Sakit", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) =>  Sekolah())
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.school, size: 23, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Daftar Sekolah", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => DownloadApp()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.building, size: 23, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Daftar Perusahaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
-                                          )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => DownloadApp()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
-                                                ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.briefcase, size: 23, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Lowongan Pekerjaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
+                                                SizedBox(height: 5),
+                                                Text("Travel", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                              ],
+                                            )
                                           )
                                         ),
-                                      )
-                                  ])
-                                ),
-                                // BARIS 3
-                                Container(
-                                  padding: EdgeInsets.only(top: 10, bottom: 40),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => Layanan()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => Hotel()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(Ionicons.ios_bed, size: 26, color: Colors.blue))
                                                 ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.headset, size: 25, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Layanan Publik", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
+                                                SizedBox(height: 5),
+                                                Text("Hotel", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                              ],
+                                            )
                                           )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => TanyaJawab()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => OlehOleh()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.utensils, size: 21, color: Colors.blue))
                                                 ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.comments, size: 24, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Tanya Jawab", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
+                                                SizedBox(height: 5),
+                                                Text("Oleh - Oleh", textAlign: TextAlign.center, style: TextStyle(fontSize: 13))
+                                              ],
+                                            )
                                           )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => Darurat()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
+                                        ),
+                                    ])
+                                  ),
+                                  // BARIS 2
+                                  Container(
+                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => RumahSakit())
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.hospital, size: 25, color: Colors.blue))
                                                 ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.phone_volume, size: 26, color: Colors.blue))
-                                              ),
-                                              SizedBox(height: 5),
-                                              Text("Nomor Darurat", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
+                                                SizedBox(height: 5),
+                                                Text("Rumah Sakit", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
                                           )
-                                        )
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(context,
-                                            MaterialPageRoute(builder: (context) => Pengaduan()),
-                                          );
-                                        },
-                                        child: Container(
-                                          width: MediaQuery.of(context).size.width / 4,
-                                          padding: EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                  borderRadius: new BorderRadius.circular(8.0),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Color(0x10000000),
-                                                      blurRadius: 3.0,
-                                                      spreadRadius: 1.0,
-                                                      offset: Offset(1.0, 3.0))]
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) =>  Sekolah())
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.school, size: 23, color: Colors.blue))
                                                 ),
-                                                child: Container(
-                                                  height: 50,
-                                                  width: 50,
-                                                  child: Icon(FontAwesome5Solid.comment_dots, size: 23, color: Colors.blue)
-                                              )),
-                                              SizedBox(height: 5),
-                                              Text("Pengaduan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
-                                            ],
+                                                SizedBox(height: 5),
+                                                Text("Daftar Sekolah", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
                                           )
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => DownloadApp()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.building, size: 23, color: Colors.blue))
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text("Daftar Perusahaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
+                                          )
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => DownloadApp()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.briefcase, size: 23, color: Colors.blue))
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text("Lowongan Pekerjaan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
+                                          ),
                                         )
-                                      ),
-                                  ])
-                                ),
+                                    ])
+                                  ),
+                                  // BARIS 3
+                                  Container(
+                                    padding: EdgeInsets.only(top: 10, bottom: 40),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => Layanan()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.headset, size: 25, color: Colors.blue))
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text("Layanan Publik", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
+                                          )
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => TanyaJawab()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.comments, size: 24, color: Colors.blue))
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text("Tanya Jawab", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
+                                          )
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => Darurat()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.phone_volume, size: 26, color: Colors.blue))
+                                                ),
+                                                SizedBox(height: 5),
+                                                Text("Nomor Darurat", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
+                                          )
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => Pengaduan()),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: MediaQuery.of(context).size.width / 4,
+                                            padding: EdgeInsets.symmetric(horizontal: 2),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                    borderRadius: new BorderRadius.circular(8.0),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Color(0x10000000),
+                                                        blurRadius: 3.0,
+                                                        spreadRadius: 1.0,
+                                                        offset: Offset(1.0, 3.0))]
+                                                  ),
+                                                  child: Container(
+                                                    height: 50,
+                                                    width: 50,
+                                                    child: Icon(FontAwesome5Solid.comment_dots, size: 23, color: Colors.blue)
+                                                )),
+                                                SizedBox(height: 5),
+                                                Text("Pengaduan", textAlign: TextAlign.center, style: TextStyle(fontSize: 12))
+                                              ],
+                                            )
+                                          )
+                                        ),
+                                    ])
+                                  ),
 
-                                // BERITA HOME
-                                new Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  color: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 15),
-                                  child: new Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  // BERITA HOME
+                                  new Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    color: Colors.white,
+                                    padding: EdgeInsets.symmetric(vertical: 15),
+                                    child: new Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        new Container(
+                                          margin: EdgeInsets.symmetric(horizontal: 20),
+                                          child: Text(
+                                            "Berita Terkini", 
+                                            style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),
+                                        ),
+                                        // Tab bar berita
+                                        new Container(
+                                          constraints: BoxConstraints.expand(height: 40),
+                                          child: TabBar(
+                                            controller: _controller,
+                                            labelColor: Colors.blue,
+                                            labelStyle: TextStyle(fontFamily: "NunitoSemiBold"),
+                                            unselectedLabelColor: Colors.blueGrey,
+                                            indicator: UnderlineTabIndicator(
+                                              insets: EdgeInsets.symmetric(horizontal:35.0),
+                                              borderSide: BorderSide(width: 2, color:Colors.blue)),
+                                            tabs: [
+                                              Tab(text: "Kabupaten"),
+                                              Tab(text: "Kota"),
+                                              Tab(text: "Nasional")
+                                            ]
+                                          )
+                                        ),
+                                        new Container(
+                                          height: 380.0,
+                                          color: Colors.white,
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: TabBarView(
+                                            controller: _controller,
+                                            children: [
+                                              Container(
+                                                child: _buildListViewSmall(dataKab),
+                                              ),
+                                              Container(
+                                                child: _buildListViewSmall(dataKot),
+                                              ),
+                                              Container(
+                                                child: _buildListViewSmall(dataNas),
+                                              ),
+                                            ]),
+                                        ),
+                                        new Container(
+                                          width: double.infinity,
+                                          margin: EdgeInsets.only(left: 20, right: 20, top: 5),
+                                          child: new FlatButton(
+                                            child: Text("Selengkapnya"),
+                                            color: Colors.blueAccent,
+                                            textColor: Colors.white,
+                                            shape: new RoundedRectangleBorder(
+                                              borderRadius: new BorderRadius.circular(8.0)),
+                                            onPressed: () {
+                                              setState(() {
+                                                _selectedTabIndex = 1;
+                                              });
+                                            }
+                                          )
+                                        )
+                                      ]
+                                    )
+                                  ),
+
+                              ])
+                            ),
+
+                            new Container(
+                              width: double.infinity,
+                              margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+                              child: new Column(
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      new Container(
-                                        margin: EdgeInsets.symmetric(horizontal: 20),
-                                        child: Text(
-                                          "Berita Terkini", 
-                                          style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),
-                                      ),
-                                      // Tab bar berita
-                                      new Container(
-                                        constraints: BoxConstraints.expand(height: 40),
-                                        child: TabBar(
-                                          controller: _controller,
-                                          labelColor: Colors.blue,
-                                          labelStyle: TextStyle(fontFamily: "NunitoSemiBold"),
-                                          unselectedLabelColor: Colors.blueGrey,
-                                          indicator: UnderlineTabIndicator(
-                                            insets: EdgeInsets.symmetric(horizontal:35.0),
-                                            borderSide: BorderSide(width: 2, color:Colors.blue)),
-                                          tabs: [
-                                            Tab(text: "Kabupaten"),
-                                            Tab(text: "Kota"),
-                                            Tab(text: "Nasional")
-                                          ]
-                                        )
-                                      ),
-                                      new Container(
-                                        height: 380.0,
-                                        color: Colors.white,
-                                        margin: EdgeInsets.only(top: 10),
-                                        child: TabBarView(
-                                          controller: _controller,
-                                          children: [
-                                            Container(
-                                              child: _buildListViewSmall(dataKab),
-                                            ),
-                                            Container(
-                                              child: _buildListViewSmall(dataKot),
-                                            ),
-                                            Container(
-                                              child: _buildListViewSmall(dataNas),
-                                            ),
-                                          ]),
-                                      ),
-                                      new Container(
-                                        width: double.infinity,
-                                        margin: EdgeInsets.only(left: 20, right: 20, top: 5),
-                                        child: new FlatButton(
-                                          child: Text("Selengkapnya"),
-                                          color: Colors.blueAccent,
-                                          textColor: Colors.white,
-                                          shape: new RoundedRectangleBorder(
-                                            borderRadius: new BorderRadius.circular(8.0)),
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedTabIndex = 1;
-                                            });
-                                          }
-                                        )
+                                      Text(
+                                        "Video Terkini", 
+                                        style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),   
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(context,
+                                            MaterialPageRoute(builder: (context) => Video()));
+                                        },
+                                        child: Container(
+                                          width: 90,
+                                          alignment: Alignment.centerRight,
+                                          child: Text("Selengkapnya", style: TextStyle(fontSize: 12, color: ColorPalette.dark)))
                                       )
                                     ]
-                                  )
-                                ),
-
-                            ])
-                          ),
-
-                          new Container(
-                            width: double.infinity,
-                            margin: EdgeInsets.only(top: 20, left: 20, right: 20),
-                            child: new Column(
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      "Video Terkini", 
-                                      style: TextStyle(fontSize: 16, letterSpacing: -0.5, color: ColorPalette.black, fontFamily: "NunitoSemiBold")),   
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(context,
-                                          MaterialPageRoute(builder: (context) => Video()));
-                                      },
-                                      child: Container(
-                                        width: 90,
-                                        alignment: Alignment.centerRight,
-                                        child: Text("Selengkapnya", style: TextStyle(fontSize: 12, color: ColorPalette.dark)))
-                                    )
-                                  ]
-                                ),
-                              ]
+                                  ),
+                                ]
+                              )
+                            ),
+                            
+                            Container(
+                              height: 176,
+                              margin: EdgeInsets.only(top: 5),
+                              padding: EdgeInsets.only(left: 15),
+                              child: isLoadingVideo
+                                ? CupertinoTheme(
+                                  data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                                  child: CupertinoActivityIndicator())
+                                : _buildListVideo(dataVideo)
                             )
-                          ),
-                          
-                          Container(
-                            height: 176,
-                            margin: EdgeInsets.only(top: 5),
-                            padding: EdgeInsets.only(left: 15),
-                            child: isLoadingVideo
-                              ? CupertinoTheme(
-                                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                                child: CupertinoActivityIndicator())
-                              : _buildListVideo(dataVideo)
-                          )
-                          
-                        ]
-                      )
-                )
-              ])
+                            
+                          ]
+                        )
+                  )
+                ])
+              )
             )
           )
         ])
