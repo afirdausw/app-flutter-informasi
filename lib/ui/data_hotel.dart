@@ -52,10 +52,10 @@ class Hotel extends StatefulWidget {
 class HotelState extends State<Hotel> {
 
   // Server URL
-  final String url = "http://10.0.2.2/onlenkan-informasi/";
+  // final String url = "http://10.0.2.2/onlenkan-informasi/";
   // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  // final String url = "https://informasi.onlenkan.org/";
+  final String url = "https://informasi.onlenkan.org/";
   
   // ADS
   InterstitialAd myInterstitial;
@@ -155,17 +155,17 @@ class HotelState extends State<Hotel> {
           width: double.infinity
         )
       : CachedNetworkImage(
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-        imageUrl: url + "uploads/hotel/" + item['gambar'],
-        placeholder: (context, url) => new Container(
-          height: 150.0,
-          child: new CupertinoTheme(data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator()),
-        ),
-        errorWidget: (context, url, error) => new Icon(Icons.error),
-        fadeOutDuration: new Duration(seconds: 1),
-        fadeInDuration: new Duration(seconds: 1),
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          imageUrl: url + "uploads/hotel/" + item['gambar'],
+          placeholder: (context, url) => new Container(
+            height: 150.0,
+            child: new CupertinoTheme(data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light), child: CupertinoActivityIndicator()),
+          ),
+          errorWidget: (context, url, error) => new Icon(Icons.error),
+          fadeOutDuration: new Duration(seconds: 1),
+          fadeInDuration: new Duration(seconds: 1),
       ),
       Container(
         height: 50,

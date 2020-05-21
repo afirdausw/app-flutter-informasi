@@ -52,10 +52,10 @@ class RumahSakit extends StatefulWidget {
 class RumahSakitState extends State<RumahSakit> {
 
   // Server URL
-  final String url = "http://10.0.2.2/onlenkan-informasi/";
+  // final String url = "http://10.0.2.2/onlenkan-informasi/";
   // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  // final String url = "https://informasi.onlenkan.org/";
+  final String url = "https://informasi.onlenkan.org/";
  
   // ADS
   InterstitialAd myInterstitial;

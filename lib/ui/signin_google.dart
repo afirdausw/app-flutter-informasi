@@ -41,7 +41,7 @@ Future<String> signInWithGoogle() async {
   sharedPreferences.setString("google_name", name);
   sharedPreferences.setString("google_email", email);
   sharedPreferences.setString("google_photo", imageUrl);
-  sharedPreferences.commit(); 
+  sharedPreferences.commit();
   
   return 'singInWithGoogle succeeded: $user';
 }

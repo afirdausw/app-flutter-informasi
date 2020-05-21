@@ -14,6 +14,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -67,8 +68,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   clearSession() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-      sharedPreferences.clear();
-      developer.log("Deleting saved session", name: "SharedPreferences");
+      sharedPreferences.remove("intro");
+      // sharedPreferences.clear();
     });
   }
 
@@ -90,9 +91,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  final String url = "http://192.168.43.17/onlenkan-informasi/";
+  // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  // final String url = "https://informasi.onlenkan.org/";
+  final String url = "https://informasi.onlenkan.org/";
 
   // Tab Bar
   TabController _controller;
@@ -106,13 +107,32 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     this.getBannerJson();
     this.getUserLogin();
     this.initFCM();
+    this.initVersion();
 
     _controller = new TabController(length: 3, vsync: this);
     _controller2 = new TabController(length: 3, vsync: this);
   }
 
+  // PACKAGE INFO
+  String appName, packageName, version, buildNumber;
+  void initVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    appName = packageInfo.appName;
+    packageName = packageInfo.packageName;
+    version = packageInfo.version;
+    buildNumber = packageInfo.buildNumber;
+  }
+
   // FIREBASE Firebase Cloud Message
   void initFCM() {
+    // LOCAL NOTIFICATION
+    flutterLocalNotificationsPlugin   = new FlutterLocalNotificationsPlugin();
+    var android                       = new AndroidInitializationSettings('ic_notification');
+    var iOS                           = new IOSInitializationSettings();
+    var initSetttings                 = new InitializationSettings(android, iOS);
+    flutterLocalNotificationsPlugin.initialize(initSetttings);
+
     _firebaseMessaging.subscribeToTopic("all");
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -138,13 +158,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       assert(token != null);
       print("Push Messaging token: $token");
     });
-
-    // LOCAL NOTIFICATION
-    flutterLocalNotificationsPlugin   = new FlutterLocalNotificationsPlugin();
-    var android                       = new AndroidInitializationSettings('ic_notification');
-    var iOS                           = new IOSInitializationSettings();
-    var initSetttings                 = new InitializationSettings(android, iOS);
-    flutterLocalNotificationsPlugin.initialize(initSetttings);
   }
 
   // Local Notification
@@ -1118,19 +1131,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         Container(
           height: MediaQuery.of(context).size.height - 146.0,
           padding: EdgeInsets.all(0),
-          child: RefreshIndicator(
-            onRefresh: getDataFromJson,
-            child: isLoading
-              ? CupertinoTheme(
-                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                child: CupertinoActivityIndicator())
-              : new ListView.builder(
-                itemCount: dataEvent.length,
-                itemBuilder: (context, index) {
-                  return _eventData(dataEvent[index]);
-                }
-            )
-          )
+          child: isLoading
+            ? CupertinoTheme(
+              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+              child: CupertinoActivityIndicator())
+            : RefreshIndicator(
+                onRefresh: getDataFromJson,
+                child: new ListView.builder(
+                  itemCount: dataEvent.length,
+                  itemBuilder: (context, index) {
+                    return _eventData(dataEvent[index]);
+                  })
+              )
         ),
 
       ]),
@@ -1211,23 +1223,37 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     )
                   ],
                 ),
-                GestureDetector(
-                  onTap: () {
-
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(top: 30),
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      boxShadow: [BoxShadow(
-                        color: Color(0x08666666),
-                        blurRadius: 1.0,
-                        spreadRadius: 1.0,
-                        offset: Offset(0.0, 2.0)
-                      )]
-                    ),
+                Container(
+                  margin: EdgeInsets.only(top: 30),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    boxShadow: [BoxShadow(
+                      color: Color(0x08666666),
+                      blurRadius: 1.0,
+                      spreadRadius: 1.0,
+                      offset: Offset(0.0, 2.0)
+                    )]
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => new AlertDialog(
+                          title: new Text('QR Code', style: TextStyle(fontSize: 16)),
+                          content: new Text('Coming soon!', style: TextStyle(fontSize: 14)),
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(8.0)),
+                          actions: <Widget>[
+                            new FlatButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: new Text('Oke')),
+                          ],
+                        ),
+                      );
+                    },
+                    splashColor: Color(0x50666666),
                     child: Row(
                       children: <Widget>[
                         Container(
@@ -1256,10 +1282,11 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   ),
                   child: Column(
                     children: <Widget>[
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
 
                         },
+                        splashColor: Color(0x50666666),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
@@ -1277,10 +1304,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.symmetric(vertical: 12),
                         child: Divider(height: 1, color: Color(0xAAEEEEEE)),
                       ),
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
-
+                          showDialog(
+                            context: context,
+                            builder: (context) => new AlertDialog(
+                              title: new Text('Versi Aplikasi', style: TextStyle(fontSize: 16)),
+                              content: new Text(appName + " v" + version, style: TextStyle(fontSize: 14)),
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(8.0)),
+                              actions: <Widget>[
+                                new FlatButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: new Text('Oke')),
+                              ],
+                            ),
+                          );
                         },
+                        splashColor: Color(0x50666666),
                         child: Row(
                           children: <Widget>[
                             Container(
@@ -1894,7 +1935,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 "gambar"    : url + "uploads/event/" + item['gambar'],
                 "judul"     : item['judul_event'],
                 "deskripsi" : item['deskripsi'],
-                "tanggal"   : item['update_pada']
+                "waktu"     : item['waktu']
               }
           )
         )

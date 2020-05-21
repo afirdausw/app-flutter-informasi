@@ -114,7 +114,7 @@ class _EventDetailState extends State<EventDetail> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(Jiffy(intent['tanggal'].toString()).format("dd MMMM yyyy, HH:mm"), style: TextStyle(fontSize: 17, height: 1.5)),
+              child: Text(Jiffy(intent['waktu'].toString()).format("dd MMMM yyyy, HH:mm"), style: TextStyle(fontSize: 17, height: 1.5)),
             ),
             SizedBox(height: 15),
             Padding(
