@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
 
+String uid;
 String name;
 String email;
 String imageUrl;
@@ -24,10 +25,12 @@ Future<String> signInWithGoogle() async {
   final FirebaseUser user = authResult.user;
 
   // Checking if email and name is null
+  assert(user.uid != null);
   assert(user.email != null);
   assert(user.displayName != null);
   assert(user.photoUrl != null);
 
+  uid = user.uid;
   name = user.displayName;
   email = user.email;
   imageUrl = user.photoUrl;
@@ -38,6 +41,7 @@ Future<String> signInWithGoogle() async {
   final FirebaseUser currentUser = await _auth.currentUser();
   assert(user.uid == currentUser.uid);
   
+  sharedPreferences.setString("google_uid", uid);
   sharedPreferences.setString("google_name", name);
   sharedPreferences.setString("google_email", email);
   sharedPreferences.setString("google_photo", imageUrl);

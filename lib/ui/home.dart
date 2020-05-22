@@ -1424,37 +1424,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.symmetric(vertical: 12),
                         child: Divider(height: 1, color: Color(0xAAEEEEEE)),
                       ),
-                      InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => new AlertDialog(
-                              title: new Text('Versi Aplikasi', style: TextStyle(fontSize: 16)),
-                              content: new Text(appName + " v" + version, style: TextStyle(fontSize: 14)),
-                              shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(8.0)),
-                              actions: <Widget>[
-                                new FlatButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
-                                  child: new Text('Oke')),
-                              ],
-                            ),
-                          );
-                        },
-                        splashColor: Color(0x50666666),
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              width: 50,
-                              padding: EdgeInsets.only(left: 2, bottom: 3),
-                              alignment: Alignment.centerLeft,
-                              child: Icon(SimpleLineIcons.info, size: 21),
-                            ),
-                            Text("App Version", style: TextStyle(fontSize: 14))
-                          ],
-                        ),
-                      )
-                    ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                width: 50,
+                                padding: EdgeInsets.only(left: 2, bottom: 3),
+                                alignment: Alignment.centerLeft,
+                                child: Icon(SimpleLineIcons.info, size: 21),
+                              ),
+                              Text("App Version", style: TextStyle(fontSize: 14))
+                            ],
+                          ),
+                          Text("v" + version, style: TextStyle(fontSize: 11, color: Colors.grey))
+                        ]
+                      ),
+                    ]
                   ) 
                 ),
 
