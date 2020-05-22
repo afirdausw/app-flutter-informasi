@@ -44,6 +44,7 @@ import 'berita_detail_banner.dart';
 import 'berita_detail_notif.dart';
 import 'event_detail.dart';
 import 'event_detail_notif.dart';
+import 'profile.dart';
 
 var isLoading = true;
 var isLoadingBanner = true;
@@ -57,6 +58,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with TickerProviderStateMixin {
 
+  // Server URL
+  // final String url = "http://10.0.2.2/onlenkan-informasi/";
+  final String url = "http://192.168.43.17/onlenkan-informasi/";
+  // final String url = "http://192.168.1.21/onlenkan-informasi/";
+  // final String url = "https://informasi.onlenkan.org/";
+
   // FIREBASE + Notification
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -67,6 +74,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   String googleName, googleEmail, googlePhoto;
   int counterBadge, _counterBadge;
 
+  // BADGE NOTIFICATION
   updateBadge() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
@@ -94,6 +102,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
   }
 
+  // GET USER LOGIN
   getUserLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
@@ -109,12 +118,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
     developer.log(checkLogin.toString(), name: 'User SignIn with Google!');
   }
-
-  // Server URL
-  // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  final String url = "http://192.168.43.17/onlenkan-informasi/";
-  // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  // final String url = "https://informasi.onlenkan.org/";
 
   // Tab Bar
   TabController _controller;
@@ -150,15 +153,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // FIREBASE Firebase Cloud Message
   void initFCM() {
-
     // LOCAL NOTIFICATION
     flutterLocalNotificationsPlugin   = new FlutterLocalNotificationsPlugin();
     var android                       = new AndroidInitializationSettings('ic_notification');
     var iOS                           = new IOSInitializationSettings();
     var initSetttings                 = new InitializationSettings(android, iOS);
     flutterLocalNotificationsPlugin.initialize(initSetttings, onSelectNotification: onSelectNotification);
-    // flutterLocalNotificationsPlugin.initialize(initSetttings);
 
+    // FIREBASE
     _firebaseMessaging.subscribeToTopic("all");
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -244,7 +246,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     }
   }
 
-  // Listing Berita
+  // Listing data from api
   List dataKab, dataKot, dataNas;
   List dataCovid, dataVideo;
   List dataEvent, dataEventBerlalu;
@@ -1401,7 +1403,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     children: <Widget>[
                       InkWell(
                         onTap: () {
-
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Profile()));
                         },
                         splashColor: Color(0x50666666),
                         child: Row(
