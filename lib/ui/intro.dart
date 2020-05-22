@@ -161,7 +161,6 @@ class _IntroPageState extends State<IntroPage> {
     setState(() {
       checkValue = true;
       sharedPreferences.setBool("intro", checkValue);
-      sharedPreferences.commit();
     });
   }
 }

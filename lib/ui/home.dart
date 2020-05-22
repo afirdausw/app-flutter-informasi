@@ -41,8 +41,9 @@ import 'informasi_tanya.dart';
 import 'notifikasi.dart';
 import 'berita_detail.dart';
 import 'berita_detail_banner.dart';
+import 'berita_detail_notif.dart';
 import 'event_detail.dart';
-
+import 'event_detail_notif.dart';
 
 var isLoading = true;
 var isLoadingBanner = true;
@@ -162,17 +163,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
-        showNotification(message["notification"]["title"], message["notification"]["body"]);
+        showNotification(
+          message["notification"]["title"],
+          message["notification"]["body"], 
+          message["data"]["screen"] + ";" + message["data"]["link"]
+        );
 
         updateBadge();
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
-        showNotification(message["notification"]["title"], message["notification"]["body"]);
+        _navigateToItemDetail(message);
       },
       onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
-        showNotification(message["notification"]["title"], message["notification"]["body"]);
+        _navigateToItemDetail(message);
       },
     );
 
@@ -187,28 +192,56 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
   }
 
-  // Local Notification
-  Future onSelectNotification(String payload) async {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return new AlertDialog(
-          title: Text("PayLoad"),
-          content: Text("Payload : $payload"),
-        );
-      },
-    );
+  void _navigateToItemDetail(Map<String, dynamic> message) {
+    final String pageChooser  = message['data']['screen'];
+    // final String pageLink     = message['data']['link'];
+
+    Navigator.pushNamed(context, pageChooser);
   }
 
-  showNotification(String title, String content) async {
+  // Local Notification
+  showNotification(String title, String content, String payload) async {
     var android = new AndroidNotificationDetails(
         '111', 'Onlenkan', 'ONLENKAN INFORMASI',
         priority: Priority.High,
-        importance: Importance.Max
+        importance: Importance.Max,
+        channelShowBadge: true, 
     );
     var iOS = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, iOS);
-    await flutterLocalNotificationsPlugin.show(0, title, content, platform, payload: 'Default_Sound');
+    await flutterLocalNotificationsPlugin.show(0, title, content, platform, payload: payload);
+  }
+
+  Future onSelectNotification(String payload) async {
+    if (payload != null) {
+      String screen = payload.substring(0, payload.indexOf(';'));
+      String link   = payload.substring(payload.indexOf(';') + 1);
+
+      print(screen);
+      print(link);
+
+      if (screen == 'berita'){
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BeritaDetailPayload(link)),
+        );
+      } else if (screen == 'pengumuman') {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Notifikasi()),
+        );
+      } else if (screen == 'event') {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => EventDetailPayload(link)),
+        );
+      } else if (screen == 'video') {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Video()),
+        );
+      }
+    }
   }
 
   // Listing Berita
@@ -342,6 +375,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           ],
         ),
       );
+    return false;
   }
 
   // Void Main
@@ -1200,8 +1234,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           height: MediaQuery.of(context).size.height - 192.0,
           child: isLoading
             ? CupertinoTheme(
-              data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-              child: CupertinoActivityIndicator())
+                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                child: CupertinoActivityIndicator())
             : TabBarView(
                 controller: _controller3,
                 children: [
@@ -1475,9 +1509,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     setState(() {
                       checkLogin = true;
                       sharedPreferences.setBool("login", checkLogin);
-                      sharedPreferences.commit();
                       print(imageUrl);
                     });
+                    getDataFromJson();
+                    getUserLogin();
                   });
                 },
                 child: Padding(
