@@ -7,10 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -28,12 +29,19 @@ class _ProfileState extends State<Profile> {
   SharedPreferences sharedPreferences;
   String googleUid, googleName, googleEmail, googlePhoto;
 
+  final txnama    = TextEditingController(); 
+  final txemail   = TextEditingController(); 
+  final txtelepon = TextEditingController(); 
+  final txtanggal = TextEditingController(); 
+  final txalamat  = TextEditingController(); 
+
   @override
   void initState() {
     super.initState();
     this.getUserLogin();
   }
 
+  // Get user data
   getUserLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
@@ -41,10 +49,15 @@ class _ProfileState extends State<Profile> {
       googleName  = sharedPreferences.getString("google_name");
       googleEmail = sharedPreferences.getString("google_email");
       googlePhoto = sharedPreferences.getString("google_photo");
-    });
-  }
 
-  int _value = 0;
+      assert(googlePhoto != null);
+
+      txnama.text   = googleName;
+      txemail.text  = googleEmail;
+    });
+
+    print(googleUid);
+  }
 
   String _selectedDate = 'Tanggal Lahir';
 
@@ -52,13 +65,32 @@ class _ProfileState extends State<Profile> {
     final DateTime d = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1890),
+      firstDate: DateTime(1980),
       lastDate: DateTime.now(),
     );
     if (d != null)
       setState(() {
-        _selectedDate = new DateFormat.yMMMMd("en_US").format(d);
+        _selectedDate = Jiffy(d).format("dd MMMM yyyy");
       });
+  }
+
+  // Radio button
+  int _value = 0;
+  int _radioValue = -1;
+
+  void _handleRadioValueChange(int value) {
+    setState(() {
+      _radioValue = value;
+
+      switch (_radioValue) {
+        case 0:
+          Fluttertoast.showToast(msg: 'Laki-laki', toastLength: Toast.LENGTH_SHORT);
+          break;
+        case 1:
+          Fluttertoast.showToast(msg: 'Perempuan', toastLength: Toast.LENGTH_SHORT);
+          break;
+      }
+    });
   }
 
   @override
@@ -108,7 +140,8 @@ class _ProfileState extends State<Profile> {
           ),
           
           Container(
-            padding: EdgeInsets.symmetric(vertical: 5),
+            height: 60,
+            padding: EdgeInsets.only(top: 8, bottom: 5),
             margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -124,17 +157,23 @@ class _ProfileState extends State<Profile> {
               )]
             ),
             child: TextField(
-              style: TextStyle(fontSize: 15),
+              controller: txnama,
+              style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16),
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.text,
+              textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
                 border: InputBorder.none,
+                // border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.only(left: 16, right: 16, bottom: 3),
-                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, height: 1.5, color: Colors.black54),
+                labelStyle: TextStyle(fontSize: 14, color: Colors.black54),
                 labelText: "Nama Lengkap" ),
             )
           ),
 
           Container(
-            padding: EdgeInsets.symmetric(vertical: 5),
+            height: 60,
+            padding: EdgeInsets.only(top: 8, bottom: 5),
             margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -150,17 +189,21 @@ class _ProfileState extends State<Profile> {
               )]
             ),
             child: TextField(
-              style: TextStyle(fontSize: 15),
+              controller: txemail,
+              style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16),
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(left: 16, right: 16, bottom: 3),
-                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, height: 1.5, color: Colors.black54),
+                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, color: Colors.black54),
                 labelText: "Email" ),
             )
           ),
 
           Container(
-            padding: EdgeInsets.symmetric(vertical: 5),
+            height: 60,
+            padding: EdgeInsets.only(top: 8, bottom: 5),
             margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -176,16 +219,19 @@ class _ProfileState extends State<Profile> {
               )]
             ),
             child: TextField(
-              style: TextStyle(fontSize: 15),
+              style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16),
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.phone,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(left: 16, right: 16, bottom: 3),
-                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, height: 1.5, color: Colors.black54),
+                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, color: Colors.black54),
                 labelText: "Telepon" ),
             )
           ),
           
           Container(
+            height: 60,
             padding: EdgeInsets.symmetric(vertical: 5),
             margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
             decoration: BoxDecoration(
@@ -206,11 +252,14 @@ class _ProfileState extends State<Profile> {
               child: Row(
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () => setState(() => _value = 0),
+                    onTap: () => setState(() {
+                      _value = 0;
+                      _handleRadioValueChange(0);
+                    }),
                     child: Container(
                       padding: EdgeInsets.only(left: 8, right: 10, bottom: 8, top: 8),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         color: _value == 0 ? Colors.blue : Colors.transparent,
                       ),
                       child: Row(
@@ -218,18 +267,21 @@ class _ProfileState extends State<Profile> {
                           Icon(Ionicons.ios_male, size: 20, color: _value == 0 ? Colors.white : Colors.black87 ),
                           SizedBox(width: 6),
                           Text("Laki-laki",
-                            style: TextStyle(fontSize: 15, color: _value == 0 ? Colors.white : Colors.black87 ))
+                            style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16, color: _value == 0 ? Colors.white : Colors.black87 ))
                         ],
                       ),
                     ),
                   ),
                   SizedBox(width: 10),
                   GestureDetector(
-                    onTap: () => setState(() => _value = 1),
+                    onTap: () => setState(() {
+                      _value = 1;
+                      _handleRadioValueChange(1);
+                    }),
                     child: Container(
                       padding: EdgeInsets.only(left: 8, right: 10, bottom: 8, top: 8),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         color: _value == 1 ? Colors.blue : Colors.transparent
                       ),
                       child: Row(
@@ -237,7 +289,7 @@ class _ProfileState extends State<Profile> {
                           Icon(Ionicons.ios_female, size: 20, color: _value == 1 ? Colors.white : Colors.black87 ),
                           SizedBox(width: 6),
                           Text("Perempuan",
-                            style: TextStyle(fontSize: 15, color: _value == 1 ? Colors.white : Colors.black87 ))
+                            style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16, color: _value == 1 ? Colors.white : Colors.black87 ))
                         ],
                       )
                     ),
@@ -248,6 +300,8 @@ class _ProfileState extends State<Profile> {
           ),
 
           Container(
+            height: 60,
+            alignment: Alignment.centerLeft,
             padding: EdgeInsets.symmetric(vertical: 5),
             margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
             decoration: BoxDecoration(
@@ -268,8 +322,8 @@ class _ProfileState extends State<Profile> {
                 _selectDate(context);
               },
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Text(_selectedDate, style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, height: 1.2, color: Colors.black54))
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                child: Text(_selectedDate, style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16))
               ),
             ) 
           ),
@@ -291,14 +345,14 @@ class _ProfileState extends State<Profile> {
               )]
             ),
             child: TextField(
-              style: TextStyle(fontSize: 15),
+              style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16, height: 1.5),
               textInputAction: TextInputAction.newline,
               keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(left: 16, right: 16, bottom: 6, top: 3),
-                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, height: 1.5, color: Colors.black54),
+                labelStyle: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 15, color: Colors.black54),
                 labelText: "Alamat Lengkap" ),
             )
           ),
