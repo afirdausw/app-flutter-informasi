@@ -1168,22 +1168,26 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         ),
         new Container(
           height: MediaQuery.of(context).size.height - 192.0,
-          child: TabBarView(
-            controller: _controller2,
-            children: [
-              RefreshIndicator(
-                child: _buildListView(dataKab),
-                onRefresh: getDataFromJson,
-              ),
-              RefreshIndicator(
-                child: _buildListView(dataKot),
-                onRefresh: getDataFromJson,
-              ),
-              RefreshIndicator(
-                child: _buildListView(dataNas),
-                onRefresh: getDataFromJson,
-              ),
-            ]),
+          child: isLoading
+            ? CupertinoTheme(
+                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                child: CupertinoActivityIndicator())
+            : TabBarView(
+                controller: _controller2,
+                children: [
+                  RefreshIndicator(
+                    child: _buildListView(dataKab),
+                    onRefresh: getDataFromJson,
+                  ),
+                  RefreshIndicator(
+                    child: _buildListView(dataKot),
+                    onRefresh: getDataFromJson,
+                  ),
+                  RefreshIndicator(
+                    child: _buildListView(dataNas),
+                    onRefresh: getDataFromJson,
+                  ),
+                ]),
         ),
       ]),
 

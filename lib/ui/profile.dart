@@ -28,17 +28,20 @@ class _ProfileState extends State<Profile> {
 
   SharedPreferences sharedPreferences;
   String googleUid, googleName, googleEmail, googlePhoto;
+  String tanggal, kelamin;
 
-  final txnama    = TextEditingController(); 
-  final txemail   = TextEditingController(); 
-  final txtelepon = TextEditingController(); 
-  final txtanggal = TextEditingController(); 
-  final txalamat  = TextEditingController(); 
+  final txnama    = TextEditingController();
+  final txemail   = TextEditingController();
+  final txtelepon = TextEditingController();
+  final txalamat  = TextEditingController();
+
+  GlobalKey<ScaffoldState> _scaffoldKey;
 
   @override
   void initState() {
     super.initState();
     this.getUserLogin();
+    _scaffoldKey = GlobalKey();
   }
 
   // Get user data
@@ -71,11 +74,12 @@ class _ProfileState extends State<Profile> {
     if (d != null)
       setState(() {
         _selectedDate = Jiffy(d).format("dd MMMM yyyy");
+        tanggal = _selectedDate;
       });
   }
 
   // Radio button
-  int _value = 0;
+  int _value = -1;
   int _radioValue = -1;
 
   void _handleRadioValueChange(int value) {
@@ -84,10 +88,14 @@ class _ProfileState extends State<Profile> {
 
       switch (_radioValue) {
         case 0:
-          Fluttertoast.showToast(msg: 'Laki-laki', toastLength: Toast.LENGTH_SHORT);
+          setState(() {
+            kelamin = "L";
+          });
           break;
         case 1:
-          Fluttertoast.showToast(msg: 'Perempuan', toastLength: Toast.LENGTH_SHORT);
+          setState(() {
+            kelamin = "P";
+          });
           break;
       }
     });
@@ -100,6 +108,7 @@ class _ProfileState extends State<Profile> {
         title: Text('Ubah Profil',
           style: TextStyle(color: Colors.white, fontSize: 18.0, fontFamily: "NunitoSemiBold"))
       ),
+      key: _scaffoldKey,
       backgroundColor: Color(0xfff5f5f5),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 35),
@@ -164,7 +173,6 @@ class _ProfileState extends State<Profile> {
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
                 border: InputBorder.none,
-                // border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.only(left: 16, right: 16, bottom: 3),
                 labelStyle: TextStyle(fontSize: 14, color: Colors.black54),
                 labelText: "Nama Lengkap" ),
@@ -219,6 +227,7 @@ class _ProfileState extends State<Profile> {
               )]
             ),
             child: TextField(
+              controller: txtelepon,
               style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16),
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.phone,
@@ -345,6 +354,7 @@ class _ProfileState extends State<Profile> {
               )]
             ),
             child: TextField(
+              controller: txalamat,
               style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16, height: 1.5),
               textInputAction: TextInputAction.newline,
               keyboardType: TextInputType.multiline,
@@ -360,7 +370,50 @@ class _ProfileState extends State<Profile> {
           SizedBox(height: 30),
           RaisedButton(
             onPressed: () {
-              // null
+              String nama     = txnama.text;
+              String email    = txemail.text;
+              String telepon  = txtelepon.text;
+              String alamat   = txalamat.text;
+
+              if (nama.length < 4 || email.length < 8 || telepon.length < 10 || alamat.length < 10 || tanggal.length < 4) {
+                _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 5),
+                    backgroundColor: Colors.red,
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Harap isi dengan benar!', style: TextStyle(fontFamily: "Nunito", fontSize: 15)),
+                        Icon(Ionicons.ios_information_circle_outline)
+                      ],
+                    ),
+                  ),
+                );
+              }
+              else {
+                _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 5),
+                    backgroundColor: Colors.blue,
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Sedang Menyimpan...', style: TextStyle(fontFamily: "Nunito", fontSize: 15)),
+                        CupertinoTheme(
+                          data: CupertinoTheme.of(context).copyWith(brightness: Brightness.dark),
+                          child: CupertinoActivityIndicator()),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              print(nama);
+              print(email);
+              print(telepon);
+              print(kelamin);
+              print(tanggal);
+              print(alamat);
             },
             elevation: 2,
             color: Color(0xff1DE983),
