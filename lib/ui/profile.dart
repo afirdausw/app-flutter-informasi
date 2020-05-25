@@ -330,7 +330,9 @@ class _ProfileState extends State<Profile> {
               onTap: () {
                 _selectDate(context);
               },
-              child: Padding(
+              child: Container(
+                width: double.infinity,
+                alignment: Alignment.centerLeft,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                 child: Text(_selectedDate, style: TextStyle(fontFamily: "NunitoSemiBold", fontSize: 16))
               ),
