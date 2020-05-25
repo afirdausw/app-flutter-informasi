@@ -25,9 +25,9 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  //  final String url = "http://192.168.43.17/onlenkan-informasi/";
+   final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  final String url = "https://informasi.onlenkan.org/";
+  // final String url = "https://informasi.onlenkan.org/";
 
   SharedPreferences sharedPreferences;
 
@@ -225,11 +225,11 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
               children: <Widget>[
                 Text(
                   item['judul_pengumuman'], 
-                  style: TextStyle(fontSize: 14, fontFamily: "NunitoSemiBold"), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
+                  style: TextStyle(fontSize: 15, fontFamily: "NunitoSemiBold"), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
                 SizedBox(height: 4),
                 Text(
                   item['deskripsi'], 
-                  style: TextStyle(fontSize: 12, color: Colors.black45), maxLines: 3, overflow: TextOverflow.ellipsis, softWrap: true),
+                  style: TextStyle(fontSize: 14, color: Colors.black45), maxLines: 3, overflow: TextOverflow.ellipsis, softWrap: true),
                 SizedBox(height: 10),
                 Text(
                   Jiffy(item['update_pada'].toString()).format("dd MMMM yyyy, HH:mm"),
@@ -301,7 +301,7 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
                     SizedBox(height: 10),
                     Text(Jiffy(update).format("dd MMMM yyyy, HH:mm"), style: TextStyle(fontSize: 12, height: 1.5, color: Colors.black45)),
                     SizedBox(height: 10),
-                    Text(deskripsi, style: TextStyle(fontSize: 14, color: ColorPalette.dark )),
+                    Text(deskripsi, style: TextStyle(fontSize: 15, color: ColorPalette.dark, height: 1.6 )),
                   ]
                 )
               ),
@@ -376,7 +376,7 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
                   style: TextStyle(fontSize: 12, color: ColorPalette.grey)),
                 Text(
                   item['judul_event'], 
-                  style: TextStyle(fontSize: 14, height: 1.5), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
+                  style: TextStyle(fontSize: 15, height: 1.5), maxLines: 2, overflow: TextOverflow.ellipsis, softWrap: true),
               ]
             )
           )

@@ -369,7 +369,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               child: new Text('Tidak')),
             new FlatButton(
               onPressed: () {
-                clearSession();
                 Navigator.of(context).pop(false);
                 SystemNavigator.pop();
               },
@@ -1457,6 +1456,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     setState(() {
                       checkLogin = false;
                     });
+
+                    clearSession();
                   },
                   elevation: 2,
                   color: Colors.redAccent,
