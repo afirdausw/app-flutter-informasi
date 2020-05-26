@@ -1385,8 +1385,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       showDialog(
                         context: context,
                         builder: (context) => new AlertDialog(
-                          title: new Text('QR Code', style: TextStyle(fontSize: 16)),
-                          content: new Text('Coming soon!', style: TextStyle(fontSize: 14)),
+                          title: new Text('QR Code - Saya', style: TextStyle(fontSize: 16)),
+                          content: new CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=Qa4vbrI4EPbewHRbYpsp0RRSTn52',
+                            placeholder: (context, url) => Container(
+                              width: double.infinity,
+                              height: 140.0,
+                              child: new CupertinoTheme(
+                                data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                                child: CupertinoActivityIndicator())
+                            ),
+                            errorWidget: (context, url, error) => new Icon(Icons.error),
+                            fadeOutDuration: new Duration(seconds: 1),
+                            fadeInDuration: new Duration(seconds: 1)),
                           shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(8.0)),
                           actions: <Widget>[
