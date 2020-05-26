@@ -50,6 +50,12 @@ Future<String> signInWithGoogle() async {
 }
 
 void signOutGoogle() async {
+  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  sharedPreferences.remove("google_uid");
+  sharedPreferences.remove("google_name");
+  sharedPreferences.remove("google_email");
+  sharedPreferences.remove("google_photo");
+
   await googleSignIn.signOut();
   print("User Sign Out");
 }

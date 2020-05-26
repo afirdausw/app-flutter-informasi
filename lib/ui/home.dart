@@ -71,7 +71,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   // Shared Session
   bool checkValue, checkLogin;
   SharedPreferences sharedPreferences;
-  String googleName, googleEmail, googlePhoto;
+  String googleUid, googleName, googleEmail, googlePhoto;
   int counterBadge, _counterBadge;
 
   // BADGE NOTIFICATION
@@ -102,13 +102,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
   }
 
-  // GET USER LOGIN
+  // GET USER LOGIN FROM GOOGLE, AND SAVE TO DB
   getUserLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       checkLogin = sharedPreferences.getBool("login");
       if (checkLogin != null && checkLogin) {
         checkLogin = true;
+        googleUid   = sharedPreferences.getString("google_uid");
         googleName  = sharedPreferences.getString("google_name");
         googleEmail = sharedPreferences.getString("google_email");
         googlePhoto = sharedPreferences.getString("google_photo");
@@ -117,6 +118,27 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       }
     });
     developer.log(checkLogin.toString(), name: 'User SignIn with Google!');
+  }
+
+  Future<String> saveProfil(String _uid, String _name, String _email, String _photo) async {
+    try {
+      var map = Map<String, dynamic>();
+      map['action']   = 'new';
+      map['uid']      = _uid;
+      map['uphoto']   = _photo;
+      map['nama']     = _name;
+      map['email']    = _email;
+
+      final response = await http.post(url + "api/profil.php", body: map);
+      print('insert user Response: ${response.body}');
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        return 'error';
+      }
+    } catch (e) {
+      return 'error';
+    }
   }
 
   // Tab Bar
@@ -1455,9 +1477,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     
                     setState(() {
                       checkLogin = false;
+                      sharedPreferences.setBool("login", checkLogin);
                     });
-
-                    clearSession();
                   },
                   elevation: 2,
                   color: Colors.redAccent,
@@ -1505,6 +1526,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       checkLogin = true;
                       sharedPreferences.setBool("login", checkLogin);
                       print(imageUrl);
+
+                      if (uid.length > 2) {
+                        saveProfil(uid, name, email, imageUrl);
+                      }
                     });
                     getDataFromJson();
                     getUserLogin();

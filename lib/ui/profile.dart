@@ -1,15 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer' as developer;
 
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:informasi/model/covid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:jiffy/jiffy.dart';
@@ -68,7 +64,7 @@ class _ProfileState extends State<Profile> {
   Future<String> updateProfil(String uid, String uphoto, String nama, String email, String telepon, String kelamin, String tanggal, String alamat) async {
     try {
       var map = Map<String, dynamic>();
-      map['action'] = 'new';
+      map['action'] = 'update';
       map['uid'] = uid;
       map['uphoto'] = uphoto;
       map['nama'] = nama;
@@ -398,6 +394,7 @@ class _ProfileState extends State<Profile> {
           ),
 
           SizedBox(height: 30),
+
           RaisedButton(
             onPressed: () {
               String nama     = txnama.text;
@@ -468,8 +465,8 @@ class _ProfileState extends State<Profile> {
             child: Text("Simpan Perubahan",
               style: TextStyle(color: Colors.white, height: 1, fontSize: 15, fontFamily: "NunitoSemiBold"))
           ),
+          
           SizedBox(height: 30)
-
 
         ],
       )
