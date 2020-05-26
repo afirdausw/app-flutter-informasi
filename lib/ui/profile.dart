@@ -9,9 +9,11 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:informasi/model/covid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:jiffy/jiffy.dart';
+
 
 class Profile extends StatefulWidget {
   @override
@@ -29,6 +31,7 @@ class _ProfileState extends State<Profile> {
   SharedPreferences sharedPreferences;
   String googleUid, googleName, googleEmail, googlePhoto;
   String tanggal, kelamin;
+  bool isLoading = false;
 
   final txnama    = TextEditingController();
   final txemail   = TextEditingController();
@@ -62,6 +65,31 @@ class _ProfileState extends State<Profile> {
     print(googleUid);
   }
 
+  Future<String> updateProfil(String uid, String uphoto, String nama, String email, String telepon, String kelamin, String tanggal, String alamat) async {
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = 'new';
+      map['uid'] = uid;
+      map['uphoto'] = uphoto;
+      map['nama'] = nama;
+      map['email'] = email;
+      map['telepon'] = telepon;
+      map['kelamin'] = kelamin;
+      map['tanggal'] = tanggal;
+      map['alamat'] = alamat;
+
+      final response = await http.post(url + "api/profil.php", body: map);
+      print('update user Response: ${response.body}');
+      if (200 == response.statusCode) {
+        return response.body;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error";
+    }
+  }
+
   String _selectedDate = 'Tanggal Lahir';
 
   Future<void> _selectDate(BuildContext context) async {
@@ -74,7 +102,7 @@ class _ProfileState extends State<Profile> {
     if (d != null)
       setState(() {
         _selectedDate = Jiffy(d).format("dd MMMM yyyy");
-        tanggal = _selectedDate;
+        tanggal = Jiffy(d).format("yyyy-MM-dd");
       });
   }
 
@@ -378,7 +406,7 @@ class _ProfileState extends State<Profile> {
               String alamat   = txalamat.text;
 
               if (nama.length < 4 || email.length < 8 || telepon.length < 10 || alamat.length < 10 || tanggal.length < 4) {
-                _scaffoldKey.currentState.showSnackBar(
+                _scaffoldKey.currentState..removeCurrentSnackBar()..showSnackBar(
                   SnackBar(
                     duration: Duration(seconds: 5),
                     backgroundColor: Colors.red,
@@ -393,9 +421,9 @@ class _ProfileState extends State<Profile> {
                 );
               }
               else {
-                _scaffoldKey.currentState.showSnackBar(
+                _scaffoldKey.currentState..removeCurrentSnackBar()..showSnackBar(
                   SnackBar(
-                    duration: Duration(seconds: 5),
+                    duration: Duration(days: 1),
                     backgroundColor: Colors.blue,
                     content: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -408,14 +436,29 @@ class _ProfileState extends State<Profile> {
                     ),
                   ),
                 );
-              }
 
-              print(nama);
-              print(email);
-              print(telepon);
-              print(kelamin);
-              print(tanggal);
-              print(alamat);
+                updateProfil(googleUid, googlePhoto, nama, email, telepon, kelamin, tanggal, alamat).then((result) {
+                  if ('success' == result) {
+                    Navigator.pop(_scaffoldKey.currentState.context);
+                  } else {
+                    _scaffoldKey.currentState..removeCurrentSnackBar()..showSnackBar(
+                      SnackBar(
+                        duration: Duration(seconds: 5),
+                        backgroundColor: Colors.red,
+                        content: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Terjadi kesalahan ketika menyimpan data!', style: TextStyle(fontFamily: "Nunito", fontSize: 15)),
+                            Icon(Ionicons.ios_information_circle_outline)
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                });
+              }
+              // End of else
+
             },
             elevation: 2,
             color: Color(0xff1DE983),
@@ -424,7 +467,8 @@ class _ProfileState extends State<Profile> {
               borderRadius: BorderRadius.circular(13)),
             child: Text("Simpan Perubahan",
               style: TextStyle(color: Colors.white, height: 1, fontSize: 15, fontFamily: "NunitoSemiBold"))
-          )
+          ),
+          SizedBox(height: 30)
 
 
         ],
