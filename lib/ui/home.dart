@@ -60,9 +60,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  // final String url = "http://192.168.43.17/onlenkan-informasi/";
+  final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  final String url = "https://informasi.onlenkan.org/";
+  // final String url = "https://informasi.onlenkan.org/";
 
   // FIREBASE + Notification
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -78,20 +78,20 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   updateBadge() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-        counterBadge  = sharedPreferences.getInt("badgeNotif");
-        _counterBadge = counterBadge != null ? counterBadge : 1;
+      counterBadge  = sharedPreferences.getInt("badgeNotif");
+      _counterBadge = counterBadge != null ? counterBadge : 1;
 
-        sharedPreferences.setInt("badgeNotif", (_counterBadge + 1));
+      sharedPreferences.setInt("badgeNotif", (_counterBadge + 1));
 
-        developer.log(counterBadge.toString(), name: "Session Badge Notif");
+      developer.log(counterBadge.toString(), name: "Session Badge Notif");
     });
   }
 
   getBadge() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
-        _counterBadge  = sharedPreferences.getInt("badgeNotif");
-        developer.log(_counterBadge.toString(), name: "Session Badge awal Notif");
+      _counterBadge  = sharedPreferences.getInt("badgeNotif");
+      developer.log(_counterBadge.toString(), name: "Session Badge awal Notif");
     });
   }
 
@@ -219,17 +219,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   void _navigateToItemDetail(Map<String, dynamic> message) {
     final String pageChooser  = message['data']['screen'];
     // final String pageLink     = message['data']['link'];
-
     Navigator.pushNamed(context, pageChooser);
   }
 
   // Local Notification
   showNotification(String title, String content, String payload) async {
     var android = new AndroidNotificationDetails(
-        '111', 'Onlenkan', 'ONLENKAN INFORMASI',
-        priority: Priority.High,
-        importance: Importance.Max,
-        channelShowBadge: true, 
+      '111', 'Onlenkan', 'ONLENKAN INFORMASI',
+      priority: Priority.High,
+      importance: Importance.Max,
+      channelShowBadge: true, 
     );
     var iOS = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, iOS);
@@ -1595,8 +1594,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       onWillPop: _onWillPop,
       child: new Scaffold(
         body: _listPage[_selectedTabIndex],
-              bottomNavigationBar: _bottomNavBar,
-              backgroundColor: Color(0xfff5f5f5),
+          bottomNavigationBar: _bottomNavBar,
+          backgroundColor: Color(0xfff5f5f5),
         )
       );
   }

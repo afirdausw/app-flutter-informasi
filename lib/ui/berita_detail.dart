@@ -89,10 +89,19 @@ class _BeritaDetailState extends State<BeritaDetail> {
               child: new CachedNetworkImage(
                 fit: BoxFit.cover,
                 imageUrl: intent['gambar'],
-                placeholder: (context, url) => new CupertinoTheme(
-                  data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
-                  child: CupertinoActivityIndicator()),
-                errorWidget: (context, url, error) => new Icon(Icons.error),
+                placeholder: (context, url) => new Container(
+                  height: 100,
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  child: Center(
+                    child: new CupertinoTheme(
+                      data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
+                      child: CupertinoActivityIndicator()))),
+                errorWidget: (context, url, error) => new Container(
+                  height: 100,
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  child: Icon(Icons.error)),
                 fadeOutDuration: new Duration(seconds: 1),
                 fadeInDuration: new Duration(seconds: 3))
             ),

@@ -166,7 +166,11 @@ class _BeritaDetailBannerState extends State<BeritaDetailBanner> {
             child: new CupertinoTheme(
               data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
               child: CupertinoActivityIndicator())),
-          errorWidget: (context, url, error) => new Icon(Icons.error),
+          errorWidget: (context, url, error) => new Container(
+            height: 100,
+            alignment: Alignment.center,
+            width: double.infinity,
+            child: Icon(Icons.error)),
           fadeOutDuration: new Duration(seconds: 1),
           fadeInDuration: new Duration(seconds: 3))
       ),

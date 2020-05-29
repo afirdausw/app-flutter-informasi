@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "425532599329",
-    "firebase_url": "https://onlenkan-informasi.firebaseio.com",
-    "project_id": "onlenkan-informasi",
-    "storage_bucket": "onlenkan-informasi.appspot.com"
+    "project_number": "809973014234",
+    "firebase_url": "https://onlenkan-pusat-informasi.firebaseio.com",
+    "project_id": "onlenkan-pusat-informasi",
+    "storage_bucket": "onlenkan-pusat-informasi.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:425532599329:android:4918385f99183192358760",
+        "mobilesdk_app_id": "1:809973014234:android:80392ce51f9a961e028fe3",
         "android_client_info": {
           "package_name": "onlenkan.informasi"
         }
       },
       "oauth_client": [
         {
-          "client_id": "425532599329-rm0lp50roe2le6gofn4a4cn9tjjjcvms.apps.googleusercontent.com",
+          "client_id": "809973014234-a3ss2dm593uf2okrkfot2g27qahrd3t5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "onlenkan.informasi",
@@ -23,20 +23,20 @@
           }
         },
         {
-          "client_id": "425532599329-9jke5s7qfj4d9rckr9op27t3p40dcte0.apps.googleusercontent.com",
+          "client_id": "809973014234-n0b8tvg7q1qgjomc6j5n2tmjooqncd5t.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC-NLAmc5GAjT8ggkqMB-WjTwVtLdodR-8"
+          "current_key": "AIzaSyBtmIFz8A1KqnKMYnzN_rj0Fi-Hkt1WHxI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "425532599329-9jke5s7qfj4d9rckr9op27t3p40dcte0.apps.googleusercontent.com",
+              "client_id": "809973014234-n0b8tvg7q1qgjomc6j5n2tmjooqncd5t.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
