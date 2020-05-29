@@ -387,14 +387,16 @@ class _NotifikasiState extends State<Notifikasi> with TickerProviderStateMixin {
 
   // WHERE EMPTY DATA 
   Widget _dataKosong(String pesan) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(FontAwesome5.sad_tear, size: 50, color: Color(0x90CCCCCC)),
-        Text("Belum ada $pesan.",
-          style: TextStyle(color: ColorPalette.dark, fontSize: 16, fontFamily: "NunitoSemiBold", height: 3)),
-        SizedBox(height: 60),
-      ],
+    return  Container(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(FontAwesome5.sad_tear, size: 50, color: Color(0x90CCCCCC)),
+          Text("Belum ada $pesan.",
+            style: TextStyle(color: ColorPalette.dark, fontSize: 16, fontFamily: "NunitoSemiBold", height: 3)),
+          SizedBox(height: 60),
+        ])
     );
   }
 }

@@ -15,6 +15,12 @@ class _DaruratState extends State<Darurat> {
   bool checkLogin;
   SharedPreferences sharedPreferences;
 
+  @override
+  void initState() {
+    super.initState();
+    this.getUserLogin();
+  }
+
   // GET USER LOGIN
   getUserLogin() async {
     sharedPreferences = await SharedPreferences.getInstance();
@@ -45,14 +51,43 @@ class _DaruratState extends State<Darurat> {
 
   // WHERE USER NOT LOG IN 
   Widget _showAlert() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(FontAwesome5.sad_tear, size: 50, color: Color(0x90CCCCCC)),
-        Text("Nampaknya anda belum login, .",
-          style: TextStyle(color: ColorPalette.dark, fontSize: 16, fontFamily: "NunitoSemiBold", height: 3)),
-        SizedBox(height: 60),
-      ],
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 15.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: Colors.greenAccent[100],
+              borderRadius: BorderRadius.circular(35)),
+            child: Icon(Ionicons.ios_lock, size: 50, color: Colors.white)),
+          SizedBox(height: 25),
+          Text("Silahkan login terlebih dahulu untuk melihat informasi.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: ColorPalette.dark, fontSize: 15, fontFamily: "NunitoSemiBold", height: 1.5)),
+          SizedBox(height: 8),
+          Text("Login dengan akun Google anda, pada menu profil.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: ColorPalette.dark, fontSize: 13, fontFamily: "Nunito", height: 1.5)),
+          new Container(
+            height: 35,
+            margin: EdgeInsets.only(left: 20, right: 20, top: 15),
+            child: new FlatButton(
+              child: Text("Kembali, dan login",
+                style: TextStyle(fontFamily: "NunitoSemiBold")),
+              color: Colors.greenAccent,
+              textColor: Colors.white,
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(10.0)),
+              onPressed: () {
+                Navigator.pop(context, "to_login");
+              }
+            )),
+          SizedBox(height: 80),
+        ]) 
     );
   }
 }

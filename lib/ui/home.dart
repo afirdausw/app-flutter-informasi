@@ -885,10 +885,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context,
+                                          onTap: () async {
+                                            final result = await Navigator.push(context,
                                               MaterialPageRoute(builder: (context) => Layanan()),
                                             );
+
+                                            if (result != null) {
+                                              setState(() {
+                                                _selectedTabIndex = 3;
+                                              });
+                                            }
                                           },
                                           child: Container(
                                             width: MediaQuery.of(context).size.width / 4,
@@ -918,10 +924,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           )
                                         ),
                                         GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context,
+                                          onTap: () async {
+                                            final result = await Navigator.push(context,
                                               MaterialPageRoute(builder: (context) => TanyaJawab()),
                                             );
+
+                                            if (result != null) {
+                                              setState(() {
+                                                _selectedTabIndex = 3;
+                                              });
+                                            }
                                           },
                                           child: Container(
                                             width: MediaQuery.of(context).size.width / 4,
@@ -951,10 +963,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           )
                                         ),
                                         GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context,
+                                          onTap: () async {
+                                            final result = await Navigator.push(context,
                                               MaterialPageRoute(builder: (context) => Darurat()),
                                             );
+
+                                            if (result != null) {
+                                              setState(() {
+                                                _selectedTabIndex = 3;
+                                              });
+                                            }
                                           },
                                           child: Container(
                                             width: MediaQuery.of(context).size.width / 4,
@@ -984,10 +1002,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           )
                                         ),
                                         GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context,
+                                          onTap: ()  async {
+                                            final result = await Navigator.push(context,
                                               MaterialPageRoute(builder: (context) => Pengaduan()),
                                             );
+
+                                            if (result != null) {
+                                              setState(() {
+                                                _selectedTabIndex = 3;
+                                              });
+                                            }
                                           },
                                           child: Container(
                                             width: MediaQuery.of(context).size.width / 4,
@@ -2148,14 +2172,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // WHERE EMPTY DATA 
   Widget _dataKosong(String pesan) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(FontAwesome5.sad_tear, size: 50, color: Color(0x90CCCCCC)),
-        Text("Belum ada $pesan.",
-          style: TextStyle(color: ColorPalette.dark, fontSize: 16, fontFamily: "NunitoSemiBold", height: 3)),
-        SizedBox(height: 60),
-      ],
+    return Container(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Icon(FontAwesome5.sad_tear, size: 50, color: Color(0x90CCCCCC)),
+          Text("Belum ada $pesan.",
+            style: TextStyle(color: ColorPalette.dark, fontSize: 16, fontFamily: "NunitoSemiBold", height: 3)),
+          SizedBox(height: 60),
+        ])
     );
   }
 }
