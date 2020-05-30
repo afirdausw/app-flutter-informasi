@@ -23,7 +23,7 @@ String getAppId() {
   if (Platform.isIOS) {
     return null;
   } else if (Platform.isAndroid) {
-    return 'ca-app-pub-5511375838860331~6177512186';
+    return 'ca-app-pub-1029252120939366~8716534287';
   }
   return null;
 }
@@ -31,7 +31,7 @@ String getBannerAdUnitId() {
   if (Platform.isIOS) {
     return null;
   } else if (Platform.isAndroid) {
-    return 'ca-app-pub-5511375838860331/4672858826';
+    return 'ca-app-pub-1029252120939366/4777289271';
   }
   return null;
 }
@@ -39,7 +39,7 @@ String getInterstitialAdUnitId() {
   if (Platform.isIOS) {
     return null;
   } else if (Platform.isAndroid) {
-    return 'ca-app-pub-5511375838860331/1991048685';
+    return 'ca-app-pub-1029252120939366/9876608682';
   }
   return null;
 }
@@ -62,8 +62,8 @@ class RumahSakitState extends State<RumahSakit> {
 
   InterstitialAd buildInterstitialAd() {
     return InterstitialAd(
-      // adUnitId: getInterstitialAdUnitId(),
-      adUnitId: InterstitialAd.testAdUnitId,
+      adUnitId: getInterstitialAdUnitId(),
+      // adUnitId: InterstitialAd.testAdUnitId,
       listener: (MobileAdEvent event) {
         if (event == MobileAdEvent.failedToLoad) {
           myInterstitial..load();

@@ -60,9 +60,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   // Server URL
   // final String url = "http://10.0.2.2/onlenkan-informasi/";
-  final String url = "http://192.168.43.17/onlenkan-informasi/";
+  // final String url = "http://192.168.43.17/onlenkan-informasi/";
   // final String url = "http://192.168.1.21/onlenkan-informasi/";
-  // final String url = "https://informasi.onlenkan.org/";
+  final String url = "https://informasi.onlenkan.org/";
 
   // FIREBASE + Notification
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -1557,17 +1557,27 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 borderSide: BorderSide(color: ColorPalette.ccc, width: 1),
                 onPressed: () {
                   signInWithGoogle().whenComplete(() {
-                    setState(() {
-                      checkLogin = true;
-                      sharedPreferences.setBool("login", checkLogin);
-                      print(imageUrl);
+                    if (uid != null || uid != '') {
+                      setState(() {
+                        checkLogin = true;
+                        sharedPreferences.setBool("login", checkLogin);
 
-                      if (uid.length > 2) {
                         saveProfil(uid, name, email, imageUrl);
-                      }
-                    });
-                    getDataFromJson();
-                    getUserLogin();
+                      });
+                      getDataFromJson();
+                      getUserLogin();
+                    }
+                    else {
+                      getDataFromJson();
+                      Fluttertoast.showToast(
+                        msg: "Terjadi kesalahan ketika login dengan Google!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        timeInSecForIosWeb: 1,
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red[900],
+                        textColor: Colors.white,
+                        fontSize: 13.0);
+                    }
                   });
                 },
                 child: Padding(

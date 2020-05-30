@@ -1,5 +1,5 @@
-import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,9 +48,9 @@ Future<String> signInWithGoogle() async {
     sharedPreferences.setString("google_email", email);
     sharedPreferences.setString("google_photo", imageUrl);
     
-    return 'singInWithGoogle succeeded: $user';
+    return 'success';
   } on PlatformException catch (e) {
-    return 'singInWithGoogle error';
+    return 'error';
   }
 }
 
