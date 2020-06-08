@@ -1999,7 +1999,11 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     child: CupertinoTheme(
                       data: CupertinoTheme.of(context).copyWith(brightness: Brightness.light),
                       child: CupertinoActivityIndicator()))),
-                errorWidget: (context, url, error) => new Icon(Icons.error),
+                errorWidget: (context, url, error) => new Container(
+                  height: 80,
+                  width: 80,
+                  alignment: Alignment.center,
+                  child: new Icon(Icons.error)),
                 fadeOutDuration: new Duration(seconds: 1),
                 fadeInDuration: new Duration(seconds: 1),
               )
