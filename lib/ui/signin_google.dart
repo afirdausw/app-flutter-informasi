@@ -50,7 +50,7 @@ Future<String> signInWithGoogle() async {
     
     return 'success';
   } on PlatformException catch (e) {
-    return 'error';
+    return 'error ' + e.message;
   }
 }
 

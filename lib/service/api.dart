@@ -7,9 +7,8 @@ import 'custom_exception.dart';
 
 class ApiProvider {
   // Server URL
-  final String _baseUrl = "http://10.0.2.2/onlenkan-informasi/";
+  final String _baseUrl = "http://192.168.0.100/onlenkan-informasi/";
   // final String _baseUrl = "http://192.168.43.17/onlenkan-informasi/";
-  // final String _baseUrl = "http://192.168.1.21/onlenkan-informasi/";
   // final String _baseUrl = "https://informasi.onlenkan.org/";
 
   Future<dynamic> get(String url) async {

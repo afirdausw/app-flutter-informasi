@@ -1602,10 +1602,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     ];
 
     final _bottomNavBarItems = <BottomNavigationBarItem>[
-      BottomNavigationBarItem(icon: Icon(Feather.home), title: Text("Home")),
-      BottomNavigationBarItem(icon: Icon(Feather.book_open), title: Text("Berita")),
-      BottomNavigationBarItem(icon: Icon(Feather.check_square), title: Text("Event")),
-      BottomNavigationBarItem(icon: Icon(Feather.user), title: Text("Profil"))
+      BottomNavigationBarItem(icon: Icon(Feather.home), label: "Home"),
+      BottomNavigationBarItem(icon: Icon(Feather.book_open), label: "Berita"),
+      BottomNavigationBarItem(icon: Icon(Feather.check_square), label: "Event"),
+      BottomNavigationBarItem(icon: Icon(Feather.user), label: "Profil")
     ];
 
     final _bottomNavBar = BottomNavigationBar(
